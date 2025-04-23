@@ -7,8 +7,29 @@ export interface DebateNotes {
   listening: Record<string, string>;
   speech: Record<string, string>;
   lastUpdated: number;
-  arguments?: Array<{id: string, title: string, content: string}>;
-  prepArguments?: Array<{id: string, title: string, content: string}>;
+  arguments?: Array<{
+    id: string;
+    claim: string;
+    whyTrue: string;
+    mechanism: string;
+    impact: string;
+    weighing: string;
+  }>;
+  prepArguments?: Array<{
+    id: string;
+    claim: string;
+    whyTrue: string;
+    mechanism: string;
+    impact: string;
+    weighing: string;
+  }>;
+  rebuttals?: Array<{
+    id: string;
+    opponentPoint: string;
+    yourRebuttal: string;
+    goldenLine: string;
+    connectToFrame: boolean;
+  }>;
   teamNotes?: {
     og: string;
     oo: string;
@@ -16,6 +37,7 @@ export interface DebateNotes {
     co: string;
   };
   interactivePrompts?: Array<{id: string, question: string, answer: string, rebuttal: string}>;
+  speechRoadmap?: string;
 }
 
 // Get notes from local storage
