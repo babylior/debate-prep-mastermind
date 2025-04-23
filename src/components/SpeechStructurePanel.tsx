@@ -2,20 +2,25 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import Timer from "@/components/Timer";
 import { Eye, Edit } from "lucide-react";
+
+interface Section {
+  title: string;
+  content: string;
+  type: 'opening' | 'argument' | 'rebuttal' | 'conclusion' | 'extension';
+}
 
 interface SpeechStructurePanelProps {
   isEditMode: boolean;
   currentSection: number;
-  sections: Array<{
-    title: string;
-    content: string;
-    type: 'opening' | 'argument' | 'rebuttal' | 'conclusion';
-  }>;
+  sections: Section[];
   onModeToggle: () => void;
   onNextSection: () => void;
   onDrop: (sectionIndex: number, itemId: string) => void;
+  onSectionContentChange: (sectionIndex: number, newContent: string) => void;
 }
 
 const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
@@ -24,7 +29,8 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
   sections,
   onModeToggle,
   onNextSection,
-  onDrop
+  onDrop,
+  onSectionContentChange
 }) => {
   const handleDrop = (e: React.DragEvent, sectionIndex: number) => {
     e.preventDefault();
@@ -34,6 +40,10 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+  };
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+    onSectionContentChange(index, e.target.value);
   };
 
   return (
@@ -62,38 +72,46 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
                 <CardTitle>{section.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                {section.content || 'Drop content here'}
+                <Textarea 
+                  value={section.content} 
+                  onChange={(e) => handleContentChange(e, index)}
+                  placeholder="Drop content here or type directly"
+                  className="min-h-[120px]"
+                />
               </CardContent>
             </Card>
           ))}
         </div>
       ) : (
-        <div className="relative min-h-[60vh] flex flex-col items-center justify-center">
-          <Timer 
-            initialTime={7 * 60}
-            timerLabel="Speech Time"
-            onComplete={() => {}}
-            className="absolute top-4 right-4"
-          />
-          <Card className="w-full max-w-3xl">
-            <CardHeader>
-              <CardTitle className="text-2xl">
-                {sections[currentSection]?.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-xl">
-              {sections[currentSection]?.content}
-            </CardContent>
-          </Card>
-          {currentSection < sections.length - 1 && (
-            <Button 
-              onClick={onNextSection}
-              className="mt-4"
-              size="lg"
-            >
-              Next Section
-            </Button>
-          )}
+        <div className="relative">
+          <div className="mb-6">
+            <Timer 
+              initialTime={7 * 60}
+              timerLabel="Speech Time"
+              onComplete={() => {}}
+              autoStart={false}
+            />
+          </div>
+          
+          <ScrollArea className="h-[70vh]">
+            <Card className="w-full">
+              <CardHeader>
+                <CardTitle className="text-2xl">
+                  Full Speech
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pb-8">
+                {sections.map((section, index) => (
+                  <div key={index} className="mb-8">
+                    <h2 className="text-xl font-bold mb-3">{section.title}</h2>
+                    <div className="whitespace-pre-wrap text-lg">
+                      {section.content || 'No content added yet'}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </ScrollArea>
         </div>
       )}
     </div>

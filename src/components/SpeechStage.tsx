@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import Timer from "@/components/Timer";
 import ExportButton from "@/components/ExportButton";
 import { useToast } from "@/components/ui/use-toast";
@@ -15,13 +17,10 @@ interface SpeechStageProps {
   onReset: () => void;
 }
 
-interface Argument {
-  id: string;
-  claim: string;
-  whyTrue: string;
-  mechanism: string;
-  impact: string;
-  weighing: string;
+interface Section {
+  title: string;
+  content: string;
+  type: 'opening' | 'argument' | 'rebuttal' | 'conclusion' | 'extension';
 }
 
 const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
@@ -30,12 +29,44 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   
   const [isEditMode, setIsEditMode] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
-  const [sections, setSections] = useState([
-    { title: 'Opening', content: '', type: 'opening' as const },
-    { title: 'Arguments', content: '', type: 'argument' as const },
-    { title: 'Rebuttals', content: '', type: 'rebuttal' as const },
-    { title: 'Conclusion', content: '', type: 'conclusion' as const }
-  ]);
+  
+  const getDefaultSections = (): Section[] => {
+    if (role === 'pm' || role === 'lo') {
+      return [
+        { title: 'Introduction & Framing', content: '', type: 'opening' },
+        { title: 'Roadmap', content: '', type: 'opening' },
+        { title: 'Argument 1', content: '', type: 'argument' },
+        { title: 'Argument 2', content: '', type: 'argument' },
+        { title: 'Rebuttals', content: '', type: 'rebuttal' },
+        { title: 'Conclusion', content: '', type: 'conclusion' }
+      ];
+    } else if (role === 'dpm' || role === 'dlo') {
+      return [
+        { title: 'Response to Opposition', content: '', type: 'rebuttal' },
+        { title: 'Reinforce Partner Points', content: '', type: 'argument' },
+        { title: 'New Argument', content: '', type: 'argument' },
+        { title: 'Strategic Rebuttals', content: '', type: 'rebuttal' },
+        { title: 'Summary & Comparison', content: '', type: 'conclusion' }
+      ];
+    } else if (role === 'mg' || role === 'mo') {
+      return [
+        { title: 'Debate Summary', content: '', type: 'opening' },
+        { title: 'Extension Introduction', content: '', type: 'extension' },
+        { title: 'Extension Justification', content: '', type: 'extension' },
+        { title: 'Strategic Comparison', content: '', type: 'rebuttal' },
+        { title: 'Summary', content: '', type: 'conclusion' }
+      ];
+    } else {
+      return [
+        { title: 'Opening', content: '', type: 'opening' },
+        { title: 'Arguments', content: '', type: 'argument' },
+        { title: 'Rebuttals', content: '', type: 'rebuttal' },
+        { title: 'Conclusion', content: '', type: 'conclusion' }
+      ];
+    }
+  };
+  
+  const [sections, setSections] = useState<Section[]>(getDefaultSections());
   
   const [content, setContent] = useState({
     argumentsList: [],
@@ -46,6 +77,12 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   useEffect(() => {
     const savedNotes = getNotes();
     if (savedNotes) {
+      if (savedNotes.speech?.sections) {
+        setSections(savedNotes.speech.sections as Section[]);
+      } else {
+        setSections(getDefaultSections());
+      }
+      
       if (savedNotes.prepArguments) {
         const prepArgs = savedNotes.prepArguments.map(arg => ({
           id: arg.id,
@@ -122,6 +159,18 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     }
   };
 
+  const handleSectionContentChange = (index: number, newContent: string) => {
+    const updatedSections = [...sections];
+    updatedSections[index].content = newContent;
+    setSections(updatedSections);
+    
+    const savedNotes = getNotes();
+    if (savedNotes) {
+      savedNotes.speech = { sections: updatedSections };
+      saveNotes(savedNotes);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
@@ -148,6 +197,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             onModeToggle={handleModeToggle}
             onNextSection={handleNextSection}
             onDrop={handleDrop}
+            onSectionContentChange={handleSectionContentChange}
           />
         </div>
         
