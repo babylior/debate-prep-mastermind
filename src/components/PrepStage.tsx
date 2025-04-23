@@ -7,11 +7,19 @@ import Timer from "@/components/Timer";
 import { useToast } from "@/components/ui/use-toast";
 import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
+import DraggableArgumentCard from './DraggableArgumentCard';
+import { Plus } from 'lucide-react';
 
 interface PrepStageProps {
   role: string;
   motion: string;
   onComplete: () => void;
+}
+
+interface Argument {
+  id: string;
+  title: string;
+  content: string;
 }
 
 const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
@@ -21,18 +29,40 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
   const [notes, setNotes] = useState<Record<string, string>>({
     'problem': '',
     'mechanism': '',
-    'arguments': '',
     'notes': ''
   });
+  const [prepArguments, setPrepArguments] = useState<Argument[]>([]);
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [autoStartTimer, setAutoStartTimer] = useState(true);
 
   // Initialize notes from localStorage
   useEffect(() => {
     const savedNotes = getNotes();
-    if (savedNotes && savedNotes.prep) {
-      setNotes(prev => ({
-        ...prev,
-        ...savedNotes.prep
-      }));
+    if (savedNotes) {
+      if (savedNotes.prep) {
+        setNotes(prev => ({
+          ...prev,
+          ...savedNotes.prep
+        }));
+      }
+      
+      if (savedNotes.prepArguments) {
+        setPrepArguments(savedNotes.prepArguments);
+      } else {
+        // Initialize with one empty argument
+        const initialArg = {
+          id: Date.now().toString(),
+          title: 'Argument 1',
+          content: ''
+        };
+        setPrepArguments([initialArg]);
+        
+        // Save the initial argument
+        if (savedNotes) {
+          savedNotes.prepArguments = [initialArg];
+          saveNotes(savedNotes);
+        }
+      }
     }
   }, [role]);
 
@@ -55,6 +85,13 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
     
     savedNotes.prep = updatedNotes;
     saveNotes(savedNotes);
+    
+    // Provide subtle visual feedback
+    toast({
+      title: "Note saved",
+      description: "Your notes have been saved.",
+      duration: 1500
+    });
   };
 
   const handleTimerComplete = () => {
@@ -62,6 +99,117 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
       title: "Time's up!",
       description: "Your 15-minute preparation time is over.",
     });
+  };
+  
+  // Argument functions
+  const addArgument = () => {
+    const newArg = {
+      id: Date.now().toString(),
+      title: `Argument ${prepArguments.length + 1}`,
+      content: ''
+    };
+    
+    const updatedArgs = [...prepArguments, newArg];
+    setPrepArguments(updatedArgs);
+    
+    // Save to localStorage
+    const savedNotes = getNotes() || {
+      motion,
+      role,
+      prep: {},
+      listening: {},
+      speech: {},
+      lastUpdated: Date.now()
+    };
+    
+    savedNotes.prepArguments = updatedArgs;
+    saveNotes(savedNotes);
+    
+    // Show feedback
+    toast({
+      title: "Argument added",
+      description: "A new argument card has been added.",
+    });
+  };
+  
+  const deleteArgument = (id: string) => {
+    const updatedArgs = prepArguments.filter(arg => arg.id !== id);
+    setPrepArguments(updatedArgs);
+    
+    // Save to localStorage
+    const savedNotes = getNotes();
+    if (savedNotes) {
+      savedNotes.prepArguments = updatedArgs;
+      saveNotes(savedNotes);
+    }
+  };
+  
+  const duplicateArgument = (id: string) => {
+    const argToDuplicate = prepArguments.find(arg => arg.id === id);
+    if (argToDuplicate) {
+      const newArg = {
+        ...argToDuplicate,
+        id: Date.now().toString(),
+        title: `${argToDuplicate.title} (Copy)`
+      };
+      
+      const updatedArgs = [...prepArguments, newArg];
+      setPrepArguments(updatedArgs);
+      
+      // Save to localStorage
+      const savedNotes = getNotes();
+      if (savedNotes) {
+        savedNotes.prepArguments = updatedArgs;
+        saveNotes(savedNotes);
+      }
+    }
+  };
+  
+  const updateArgument = (id: string, content: string) => {
+    const updatedArgs = prepArguments.map(arg =>
+      arg.id === id ? { ...arg, content } : arg
+    );
+    
+    setPrepArguments(updatedArgs);
+    
+    // Save to localStorage
+    const savedNotes = getNotes();
+    if (savedNotes) {
+      savedNotes.prepArguments = updatedArgs;
+      saveNotes(savedNotes);
+    }
+  };
+  
+  // Drag and drop handlers
+  const handleDragStart = (index: number) => {
+    setDraggedItemIndex(index);
+  };
+  
+  const handleDragEnd = () => {
+    setDraggedItemIndex(null);
+  };
+  
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedItemIndex === null || draggedItemIndex === index) return;
+    
+    const newArguments = [...prepArguments];
+    const draggedItem = newArguments[draggedItemIndex];
+    
+    // Remove the dragged item
+    newArguments.splice(draggedItemIndex, 1);
+    // Insert it at the new position
+    newArguments.splice(index, 0, draggedItem);
+    
+    setDraggedItemIndex(index);
+    setPrepArguments(newArguments);
+    
+    // Save the new order to localStorage
+    const savedNotes = getNotes();
+    if (savedNotes) {
+      savedNotes.prepArguments = newArguments;
+      saveNotes(savedNotes);
+    }
   };
 
   return (
@@ -79,6 +227,7 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
             initialTime={15 * 60} // 15 minutes in seconds
             timerLabel="Prep Time"
             onComplete={handleTimerComplete}
+            autoStart={autoStartTimer}
           />
           
           <Card>
@@ -151,19 +300,37 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Key Arguments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="List your main arguments..."
-                className="min-h-[150px]"
-                value={notes.arguments}
-                onChange={(e) => handleNoteChange('arguments', e.target.value)}
-              />
-            </CardContent>
-          </Card>
+          {/* Arguments section */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Arguments</h2>
+              <Button onClick={addArgument}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Argument
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {prepArguments.map((arg, index) => (
+                <div 
+                  key={arg.id} 
+                  onDragOver={(e) => handleDragOver(e, index)}
+                >
+                  <DraggableArgumentCard
+                    id={arg.id}
+                    title={arg.title}
+                    content={arg.content}
+                    index={index}
+                    onDelete={deleteArgument}
+                    onDuplicate={duplicateArgument}
+                    onChange={updateArgument}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
           
           <Card>
             <CardHeader>

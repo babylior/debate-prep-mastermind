@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PrepStage from './PrepStage';
 import ListeningStage from './ListeningStage';
 import SpeechStage from './SpeechStage';
 import { debateRoles, DebateRole } from '@/utils/debateData';
 import { getNotes, getMotion } from '@/utils/localStorage';
+import NavigationBar from './NavigationBar';
 
 interface DebateStagesProps {
   selectedRole: string;
@@ -35,6 +36,10 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
     }
   }, [motion]);
   
+  const handleStageChange = (stage: string) => {
+    setActiveStage(stage);
+  };
+  
   const handlePrepComplete = () => {
     setActiveStage('listening');
   };
@@ -45,7 +50,8 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
 
   return (
     <div className="w-full">
-      <div className="flex items-center mb-6">
+      {/* Team and motion info at the top */}
+      <div className="hidden lg:flex items-center mb-6">
         <div className={`${teamColor} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3`}>
           {currentRole?.name || ''}
         </div>
@@ -55,14 +61,16 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
         </div>
       </div>
       
-      <Tabs value={activeStage} onValueChange={setActiveStage} className="w-full">
-        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto mb-6">
-          <TabsTrigger value="prep" disabled={activeStage === 'listening' || activeStage === 'speech'}>Prep</TabsTrigger>
-          <TabsTrigger value="listening" disabled={activeStage === 'speech'}>Listening</TabsTrigger>
-          <TabsTrigger value="speech">Speech</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="prep">
+      {/* Persistent navigation bar */}
+      <NavigationBar 
+        activeStage={activeStage} 
+        onStageChange={handleStageChange}
+        role={role}
+        motion={motion}
+      />
+      
+      <Tabs value={activeStage} onValueChange={handleStageChange} className="w-full">
+        <TabsContent value="prep" className="m-0 mt-0">
           <PrepStage 
             role={role} 
             motion={motion} 
@@ -70,7 +78,7 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
           />
         </TabsContent>
         
-        <TabsContent value="listening">
+        <TabsContent value="listening" className="m-0 mt-0">
           <ListeningStage 
             role={role} 
             motion={motion} 
@@ -78,7 +86,7 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
           />
         </TabsContent>
         
-        <TabsContent value="speech">
+        <TabsContent value="speech" className="m-0 mt-0">
           <SpeechStage 
             role={role} 
             motion={motion} 

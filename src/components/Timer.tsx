@@ -7,11 +7,12 @@ interface TimerProps {
   initialTime: number; // time in seconds
   timerLabel: string;
   onComplete?: () => void;
+  autoStart?: boolean;
 }
 
-const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete }) => {
+const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, autoStart = false }) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState(autoStart);
 
   // Format time into mm:ss
   const formatTime = (seconds: number): string => {
@@ -62,10 +63,10 @@ const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete }) =>
   };
 
   return (
-    <div className="w-full bg-gray-100 rounded-lg shadow p-4">
+    <div className="w-full bg-white rounded-lg shadow p-4 sticky top-24">
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium text-gray-700">{timerLabel}</h3>
-        <span className={`text-xl font-bold ${timeLeft < 60 ? 'text-red-600 animate-timer-pulse' : ''}`}>
+        <span className={`text-xl font-bold ${timeLeft < 60 ? 'text-red-600 animate-pulse' : ''}`}>
           {formatTime(timeLeft)}
         </span>
       </div>

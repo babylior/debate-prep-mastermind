@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
-import { Textarea } from "@/components/ui/textarea";
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
@@ -8,6 +7,8 @@ import ExportButton from "@/components/ExportButton";
 import { useToast } from "@/components/ui/use-toast";
 import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
+import DraggableArgumentCard from "./DraggableArgumentCard";
+import { Plus } from 'lucide-react';
 
 interface SpeechStageProps {
   role: string;
@@ -15,11 +16,20 @@ interface SpeechStageProps {
   onReset: () => void;
 }
 
+interface Argument {
+  id: string;
+  title: string;
+  content: string;
+}
+
 const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
   
+  // State for regular speech notes and draggable arguments
   const [speechNotes, setSpeechNotes] = useState<Record<string, string>>({});
+  const [arguments, setArguments] = useState<Argument[]>([]);
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
   // Initialize template sections
   const templateSections = roleData.speech.templateSections || [];
@@ -27,15 +37,37 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   // Initialize notes from localStorage
   useEffect(() => {
     const savedNotes = getNotes();
-    if (savedNotes && savedNotes.speech) {
-      setSpeechNotes(savedNotes.speech);
-    } else {
-      // Initialize with empty sections
-      const initial: Record<string, string> = {};
-      templateSections.forEach(section => {
-        initial[section.name] = '';
-      });
-      setSpeechNotes(initial);
+    if (savedNotes) {
+      // Load speech notes
+      if (savedNotes.speech) {
+        setSpeechNotes(savedNotes.speech);
+      } else {
+        // Initialize with empty sections
+        const initial: Record<string, string> = {};
+        templateSections.forEach(section => {
+          initial[section.name] = '';
+        });
+        setSpeechNotes(initial);
+      }
+      
+      // Load arguments
+      if (savedNotes.arguments) {
+        setArguments(savedNotes.arguments);
+      } else {
+        // Initialize with one empty argument
+        const initialArg = {
+          id: Date.now().toString(),
+          title: 'Argument 1',
+          content: ''
+        };
+        setArguments([initialArg]);
+        
+        // Save the initial argument
+        if (savedNotes) {
+          savedNotes.arguments = [initialArg];
+          saveNotes(savedNotes);
+        }
+      }
     }
   }, [role, templateSections]);
 
@@ -59,13 +91,124 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     savedNotes.speech = updatedNotes;
     saveNotes(savedNotes);
   };
-
+  
   const handleTimerComplete = () => {
     toast({
       title: "Time's up!",
       description: "Your 7-minute speech time is over.",
     });
   };
+  
+  // Argument functions
+  const addArgument = () => {
+    const newArg = {
+      id: Date.now().toString(),
+      title: `Argument ${arguments.length + 1}`,
+      content: ''
+    };
+    
+    const updatedArgs = [...arguments, newArg];
+    setArguments(updatedArgs);
+    
+    // Save to localStorage
+    const savedNotes = getNotes() || {
+      motion,
+      role,
+      prep: {},
+      listening: {},
+      speech: {},
+      lastUpdated: Date.now()
+    };
+    
+    savedNotes.arguments = updatedArgs;
+    saveNotes(savedNotes);
+    
+    // Show feedback
+    toast({
+      title: "Argument added",
+      description: "A new argument card has been added."
+    });
+  };
+  
+  const deleteArgument = (id: string) => {
+    const updatedArgs = arguments.filter(arg => arg.id !== id);
+    setArguments(updatedArgs);
+    
+    // Save to localStorage
+    const savedNotes = getNotes();
+    if (savedNotes) {
+      savedNotes.arguments = updatedArgs;
+      saveNotes(savedNotes);
+    }
+  };
+  
+  const duplicateArgument = (id: string) => {
+    const argToDuplicate = arguments.find(arg => arg.id === id);
+    if (argToDuplicate) {
+      const newArg = {
+        ...argToDuplicate,
+        id: Date.now().toString(),
+        title: `${argToDuplicate.title} (Copy)`
+      };
+      
+      const updatedArgs = [...arguments, newArg];
+      setArguments(updatedArgs);
+      
+      // Save to localStorage
+      const savedNotes = getNotes();
+      if (savedNotes) {
+        savedNotes.arguments = updatedArgs;
+        saveNotes(savedNotes);
+      }
+    }
+  };
+  
+  const updateArgument = (id: string, content: string) => {
+    const updatedArgs = arguments.map(arg =>
+      arg.id === id ? { ...arg, content } : arg
+    );
+    
+    setArguments(updatedArgs);
+    
+    // Save to localStorage
+    const savedNotes = getNotes();
+    if (savedNotes) {
+      savedNotes.arguments = updatedArgs;
+      saveNotes(savedNotes);
+    }
+  };
+  
+  // Drag and drop handlers
+  const handleDragStart = (index: number) => {
+    setDraggedItemIndex(index);
+  };
+  
+  const handleDragEnd = () => {
+    setDraggedItemIndex(null);
+  };
+  
+  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedItemIndex === null || draggedItemIndex === index) return;
+    
+    const newArguments = [...arguments];
+    const draggedItem = newArguments[draggedItemIndex];
+    
+    // Remove the dragged item
+    newArguments.splice(draggedItemIndex, 1);
+    // Insert it at the new position
+    newArguments.splice(index, 0, draggedItem);
+    
+    setDraggedItemIndex(index);
+    setArguments(newArguments);
+    
+    // Save the new order to localStorage
+    const savedNotes = getNotes();
+    if (savedNotes) {
+      savedNotes.arguments = newArguments;
+      saveNotes(savedNotes);
+    }
+  }, [arguments, draggedItemIndex]);
 
   return (
     <div className="max-w-6xl mx-auto p-4">
@@ -138,8 +281,11 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         
         {/* Right Column - Speech Builder */}
         <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-xl font-semibold">Speech Builder</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Speech Builder</h2>
+          </div>
           
+          {/* Template sections */}
           {templateSections.map((section, idx) => (
             <Card key={idx}>
               <CardHeader>
@@ -147,15 +293,47 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
                 <CardDescription>{section.duration} - {section.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Textarea
+                <textarea
                   placeholder={`Write your ${section.name.toLowerCase()} here...`}
-                  className="min-h-[100px]"
+                  className="w-full min-h-[100px] p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={speechNotes[section.name] || ''}
                   onChange={(e) => handleNoteChange(section.name, e.target.value)}
                 />
               </CardContent>
             </Card>
           ))}
+          
+          {/* Arguments section */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Arguments</h2>
+              <Button onClick={addArgument}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Argument
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {arguments.map((arg, index) => (
+                <div 
+                  key={arg.id} 
+                  onDragOver={(e) => handleDragOver(e, index)}
+                >
+                  <DraggableArgumentCard
+                    id={arg.id}
+                    title={arg.title}
+                    content={arg.content}
+                    index={index}
+                    onDelete={deleteArgument}
+                    onDuplicate={duplicateArgument}
+                    onChange={updateArgument}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

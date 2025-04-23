@@ -7,6 +7,15 @@ export interface DebateNotes {
   listening: Record<string, string>;
   speech: Record<string, string>;
   lastUpdated: number;
+  arguments?: Array<{id: string, title: string, content: string}>;
+  prepArguments?: Array<{id: string, title: string, content: string}>;
+  teamNotes?: {
+    og: string;
+    oo: string;
+    cg: string;
+    co: string;
+  };
+  interactivePrompts?: Array<{id: string, question: string, answer: string, rebuttal: string}>;
 }
 
 // Get notes from local storage

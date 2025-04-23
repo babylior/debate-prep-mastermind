@@ -28,10 +28,12 @@ const Index = () => {
   };
   
   const handleReset = () => {
-    clearNotes();
-    setStage('selection');
-    setSelectedRole('');
-    setMotion('');
+    if (window.confirm('Are you sure you want to reset your debate session? All notes will be cleared.')) {
+      clearNotes();
+      setStage('selection');
+      setSelectedRole('');
+      setMotion('');
+    }
   };
 
   return (
