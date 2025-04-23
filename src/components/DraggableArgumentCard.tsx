@@ -21,37 +21,36 @@ interface DraggableArgumentCardProps {
     field: "claim" | "whyTrue" | "mechanism" | "impact" | "weighing",
     value: string
   ) => void;
-  onAdd?: () => void; // Show "+ Add Another Argument" when provided
+  onAdd?: () => void;
   onDragStart?: (index: number) => void;
   onDragEnd?: () => void;
 }
 
-// Mapping for form fields/labels/placeholders
-const FIELD_CONFIG = [
+const SECTION_FIELDS = [
   {
     key: "claim",
     label: "Claim",
-    placeholder: "🚩 מה הטענה המרכזית שלך כאן?",
+    placeholder: "🚩 What is the main argument?",
   },
   {
     key: "whyTrue",
     label: "Why True",
-    placeholder: "למה זה נכון? מה הופך את זה לאמיתי או מבוסס?",
+    placeholder: "Why is this logically or factually correct?",
   },
   {
     key: "mechanism",
     label: "Mechanism",
-    placeholder: "איך זה קורה בפועל? מי עושה מה, מתי ואיך?",
+    placeholder: "How does this work in reality?",
   },
   {
     key: "impact",
     label: "Impact",
-    placeholder: "למה זה חשוב? איך זה משפיע על העולם או על אנשים?",
+    placeholder: "Why does this matter? What are the consequences?",
   },
   {
     key: "weighing",
     label: "Weighing",
-    placeholder: "למה זה גובר על הטיעון של הצד השני?",
+    placeholder: "Why is this stronger than the opposing side?",
   },
 ] as const;
 
@@ -72,23 +71,7 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
 }) => {
   const { toast } = useToast();
 
-  // Render a single section with correct field/label/placeholder
-  const renderField = (
-    fieldKey: "claim" | "whyTrue" | "mechanism" | "impact" | "weighing",
-    label: string,
-    placeholder: string,
-    value: string
-  ) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium mb-1">{label}</label>
-      <Textarea
-        value={value}
-        onChange={(e) => onChange(id, fieldKey, e.target.value)}
-        placeholder={placeholder}
-        className="w-full min-h-[60px] bg-white border border-gray-200 rounded-md p-2 text-base placeholder:text-gray-400 mt-1"
-      />
-    </div>
-  );
+  const values = { claim, whyTrue, mechanism, impact, weighing };
 
   return (
     <div
@@ -99,7 +82,10 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
     >
       <Card className="bg-white border border-gray-200 rounded-lg shadow transition-shadow flex flex-col">
         <CardHeader className="flex flex-row items-center justify-between bg-gray-50 rounded-t-lg p-3">
-          <span className="font-semibold text-primary">Argument</span>
+          <span className="font-semibold text-primary flex items-center">
+            <span className="mr-1">🚩</span>
+            Argument
+          </span>
           <div className="flex gap-1">
             <Button
               variant="ghost"
@@ -112,6 +98,7 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
                 });
               }}
               className="h-8 w-8 p-0"
+              type="button"
             >
               <Copy className="h-4 w-4" />
             </Button>
@@ -126,35 +113,29 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
                 });
               }}
               className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+              type="button"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
         <CardContent className="pt-4">
-          {/* All sections */}
-          {FIELD_CONFIG.map((config) =>
-            renderField(
-              config.key as
-                | "claim"
-                | "whyTrue"
-                | "mechanism"
-                | "impact"
-                | "weighing",
-              config.label,
-              config.placeholder,
-              {
-                claim,
-                whyTrue,
-                mechanism,
-                impact,
-                weighing,
-              }[config.key as keyof typeof config]
-            )
-          )}
+          {SECTION_FIELDS.map(({ key, label, placeholder }) => (
+            <div className="mb-4" key={key}>
+              <label className="block text-sm font-medium mb-1" htmlFor={`${id}-${key}`}>
+                {label}
+              </label>
+              <Textarea
+                id={`${id}-${key}`}
+                value={values[key]}
+                onChange={e => onChange(id, key, e.target.value)}
+                placeholder={placeholder}
+                className="w-full min-h-[60px] bg-white border border-gray-200 rounded-md p-2 text-base placeholder:text-gray-400 mt-1"
+              />
+            </div>
+          ))}
         </CardContent>
       </Card>
-      {/* Show "Add Another Argument" below card if onAdd is given */}
       {onAdd && (
         <div className="flex justify-end mt-2">
           <Button
@@ -162,6 +143,7 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
             size="sm"
             onClick={onAdd}
             className="px-3 py-1 rounded flex items-center gap-2"
+            type="button"
           >
             <span className="text-lg leading-none">+</span>
             <span>Add Another Argument</span>

@@ -17,24 +17,24 @@ interface RebuttalCardProps {
     value: string | boolean
   ) => void;
   onDelete: (id: string) => void;
-  onAdd?: () => void; // Show "+ Add Rebuttal" button if provided
+  onAdd?: () => void;
 }
 
-const FIELD_CONFIG = [
+const FIELDS = [
   {
     key: "opponentPoint",
     label: "Opposition Point",
-    placeholder: "מה בדיוק טען הצד השני?",
+    placeholder: "What did the opponent claim?",
   },
   {
     key: "yourRebuttal",
     label: "Your Rebuttal",
-    placeholder: "מה התשובה שלך? איך את מפרקת את הטענה הזו?",
+    placeholder: "What is your direct response or counterargument?",
   },
   {
     key: "goldenLine",
     label: "Golden Line",
-    placeholder: "שורת סיכום חדת מסר",
+    placeholder: "A concise, memorable summary sentence of your rebuttal",
   },
 ] as const;
 
@@ -50,63 +50,46 @@ const RebuttalCard: React.FC<RebuttalCardProps> = ({
 }) => {
   const { toast } = useToast();
 
-  // Render a text area for each main field
-  const renderField = (
-    fieldKey: "opponentPoint" | "yourRebuttal" | "goldenLine",
-    label: string,
-    placeholder: string,
-    value: string
-  ) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium mb-1">{label}</label>
-      <Textarea
-        value={value}
-        onChange={(e) => onChange(id, fieldKey, e.target.value)}
-        placeholder={placeholder}
-        className="w-full min-h-[54px] bg-white border border-gray-200 rounded-md p-2 text-base placeholder:text-gray-400 mt-1"
-      />
-    </div>
-  );
+  const values = { opponentPoint, yourRebuttal, goldenLine };
 
   return (
     <Card className="bg-white border border-gray-200 rounded-lg shadow flex flex-col mb-4">
       <CardHeader className="bg-gray-50 rounded-t-lg p-3 pb-2">
-        <span className="font-semibold text-red-600">Rebuttal</span>
+        <span className="font-semibold text-primary flex items-center">
+          <span className="mr-1">🚩</span>
+          Rebuttal
+        </span>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => {
-            onDelete(id);
-          }}
+          onClick={() => onDelete(id)}
           className="h-8 w-20 p-0 mt-1 text-red-500 hover:text-red-700 self-end"
+          type="button"
         >
           Delete
         </Button>
       </CardHeader>
       <CardContent className="pt-3 pb-4">
-        {FIELD_CONFIG.map((config) =>
-          renderField(
-            config.key as
-              | "opponentPoint"
-              | "yourRebuttal"
-              | "goldenLine",
-            config.label,
-            config.placeholder,
-            {
-              opponentPoint,
-              yourRebuttal,
-              goldenLine,
-            }[config.key as keyof typeof config]
-          )
-        )}
+        {FIELDS.map(({ key, label, placeholder }) => (
+          <div className="mb-4" key={key}>
+            <label className="block text-sm font-medium mb-1" htmlFor={`${id}-${key}`}>
+              {label}
+            </label>
+            <Textarea
+              id={`${id}-${key}`}
+              value={values[key]}
+              onChange={e => onChange(id, key, e.target.value)}
+              placeholder={placeholder}
+              className="w-full min-h-[54px] bg-white border border-gray-200 rounded-md p-2 text-base placeholder:text-gray-400 mt-1"
+            />
+          </div>
+        ))}
         <div className="flex items-center mb-2">
           <input
             type="checkbox"
             checked={connectToFrame}
             id={`connect-${id}`}
-            onChange={(e) =>
-              onChange(id, "connectToFrame", e.target.checked)
-            }
+            onChange={e => onChange(id, "connectToFrame", e.target.checked)}
             className="accent-purple-500 h-4 w-4 mr-2"
           />
           <label htmlFor={`connect-${id}`} className="text-sm">
@@ -118,15 +101,14 @@ const RebuttalCard: React.FC<RebuttalCardProps> = ({
             variant="outline"
             size="sm"
             onClick={() => {
-              if (onAdd) {
-                onAdd();
-                toast({
-                  title: "✅ Rebuttal added",
-                  description: "",
-                });
-              }
+              onAdd();
+              toast({
+                title: "✅ Rebuttal added",
+                description: "",
+              });
             }}
             className="px-3 py-1 mt-2 flex items-center gap-2"
+            type="button"
           >
             <span className="text-lg leading-none">+</span>
             <span>Add Rebuttal</span>
