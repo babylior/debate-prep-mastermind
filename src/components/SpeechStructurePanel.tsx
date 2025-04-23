@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Timer } from "@/components/Timer";
+import Timer from "@/components/Timer";
 import { Eye, Edit } from "lucide-react";
 
 interface SpeechStructurePanelProps {
@@ -11,9 +11,11 @@ interface SpeechStructurePanelProps {
   sections: Array<{
     title: string;
     content: string;
+    type: 'opening' | 'argument' | 'rebuttal' | 'conclusion';
   }>;
   onModeToggle: () => void;
   onNextSection: () => void;
+  onDrop: (sectionIndex: number, itemId: string) => void;
 }
 
 const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
@@ -22,7 +24,18 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
   sections,
   onModeToggle,
   onNextSection,
+  onDrop
 }) => {
+  const handleDrop = (e: React.DragEvent, sectionIndex: number) => {
+    e.preventDefault();
+    const itemId = e.dataTransfer.getData('text/plain');
+    onDrop(sectionIndex, itemId);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <div className="relative">
       <div className="flex justify-end mb-4 gap-2">
@@ -41,13 +54,15 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
           {sections.map((section, index) => (
             <Card 
               key={index}
-              className="border-2 border-dashed border-gray-300 p-4"
+              className={`border-2 border-dashed ${!section.content ? 'border-gray-300' : 'border-transparent'}`}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragOver={handleDragOver}
             >
               <CardHeader>
                 <CardTitle>{section.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                {section.content || 'Drag content here'}
+                {section.content || 'Drop content here'}
               </CardContent>
             </Card>
           ))}
@@ -70,13 +85,15 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
               {sections[currentSection]?.content}
             </CardContent>
           </Card>
-          <Button 
-            onClick={onNextSection}
-            className="mt-4"
-            size="lg"
-          >
-            Next Section
-          </Button>
+          {currentSection < sections.length - 1 && (
+            <Button 
+              onClick={onNextSection}
+              className="mt-4"
+              size="lg"
+            >
+              Next Section
+            </Button>
+          )}
         </div>
       )}
     </div>
