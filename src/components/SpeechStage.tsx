@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,11 @@ interface SpeechStageProps {
 
 interface Argument {
   id: string;
-  title: string;
-  content: string;
+  claim: string;
+  whyTrue: string;
+  mechanism: string;
+  impact: string;
+  weighing: string;
 }
 
 const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
@@ -54,10 +58,13 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         setDebateArguments(savedNotes.arguments);
       } else {
         // Initialize with one empty argument
-        const initialArg = {
+        const initialArg: Argument = {
           id: Date.now().toString(),
-          title: 'Argument 1',
-          content: ''
+          claim: '',
+          whyTrue: '',
+          mechanism: '',
+          impact: '',
+          weighing: ''
         };
         setDebateArguments([initialArg]);
         
@@ -100,10 +107,13 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   
   // Argument functions
   const addArgument = () => {
-    const newArg = {
+    const newArg: Argument = {
       id: Date.now().toString(),
-      title: `Argument ${debateArguments.length + 1}`,
-      content: ''
+      claim: '',
+      whyTrue: '',
+      mechanism: '',
+      impact: '',
+      weighing: ''
     };
     
     const updatedArgs = [...debateArguments, newArg];
@@ -146,8 +156,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     if (argToDuplicate) {
       const newArg = {
         ...argToDuplicate,
-        id: Date.now().toString(),
-        title: `${argToDuplicate.title} (Copy)`
+        id: Date.now().toString()
       };
       
       const updatedArgs = [...debateArguments, newArg];
@@ -162,9 +171,13 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     }
   };
   
-  const updateArgument = (id: string, content: string) => {
+  const updateArgument = (
+    id: string, 
+    field: "claim" | "whyTrue" | "mechanism" | "impact" | "weighing", 
+    value: string
+  ) => {
     const updatedArgs = debateArguments.map(arg =>
-      arg.id === id ? { ...arg, content } : arg
+      arg.id === id ? { ...arg, [field]: value } : arg
     );
     
     setDebateArguments(updatedArgs);
@@ -320,8 +333,11 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
                 >
                   <DraggableArgumentCard
                     id={arg.id}
-                    title={arg.title}
-                    content={arg.content}
+                    claim={arg.claim}
+                    whyTrue={arg.whyTrue}
+                    mechanism={arg.mechanism}
+                    impact={arg.impact}
+                    weighing={arg.weighing}
                     index={index}
                     onDelete={deleteArgument}
                     onDuplicate={duplicateArgument}

@@ -18,8 +18,11 @@ interface PrepStageProps {
 
 interface Argument {
   id: string;
-  title: string;
-  content: string;
+  claim: string;
+  whyTrue: string;
+  mechanism: string;
+  impact: string;
+  weighing: string;
 }
 
 const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
@@ -50,10 +53,13 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
         setPrepArguments(savedNotes.prepArguments);
       } else {
         // Initialize with one empty argument
-        const initialArg = {
+        const initialArg: Argument = {
           id: Date.now().toString(),
-          title: 'Argument 1',
-          content: ''
+          claim: '',
+          whyTrue: '',
+          mechanism: '',
+          impact: '',
+          weighing: ''
         };
         setPrepArguments([initialArg]);
         
@@ -103,10 +109,13 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
   
   // Argument functions
   const addArgument = () => {
-    const newArg = {
+    const newArg: Argument = {
       id: Date.now().toString(),
-      title: `Argument ${prepArguments.length + 1}`,
-      content: ''
+      claim: '',
+      whyTrue: '',
+      mechanism: '',
+      impact: '',
+      weighing: ''
     };
     
     const updatedArgs = [...prepArguments, newArg];
@@ -149,8 +158,7 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
     if (argToDuplicate) {
       const newArg = {
         ...argToDuplicate,
-        id: Date.now().toString(),
-        title: `${argToDuplicate.title} (Copy)`
+        id: Date.now().toString()
       };
       
       const updatedArgs = [...prepArguments, newArg];
@@ -165,9 +173,13 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
     }
   };
   
-  const updateArgument = (id: string, content: string) => {
+  const updateArgument = (
+    id: string, 
+    field: "claim" | "whyTrue" | "mechanism" | "impact" | "weighing", 
+    value: string
+  ) => {
     const updatedArgs = prepArguments.map(arg =>
-      arg.id === id ? { ...arg, content } : arg
+      arg.id === id ? { ...arg, [field]: value } : arg
     );
     
     setPrepArguments(updatedArgs);
@@ -318,8 +330,11 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
                 >
                   <DraggableArgumentCard
                     id={arg.id}
-                    title={arg.title}
-                    content={arg.content}
+                    claim={arg.claim}
+                    whyTrue={arg.whyTrue}
+                    mechanism={arg.mechanism}
+                    impact={arg.impact}
+                    weighing={arg.weighing}
                     index={index}
                     onDelete={deleteArgument}
                     onDuplicate={duplicateArgument}
