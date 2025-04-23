@@ -35,6 +35,14 @@ export interface DebateNotes {
     oo: string;
     cg: string;
     co: string;
+    ogRebuttal?: string;
+    ooRebuttal?: string;
+    cgRebuttal?: string;
+    coRebuttal?: string;
+    ogComparison?: string;
+    ooComparison?: string;
+    cgComparison?: string;
+    coComparison?: string;
   };
   interactivePrompts?: Array<{id: string, question: string, answer: string, rebuttal: string}>;
 }
