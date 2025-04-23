@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   
   // State for regular speech notes and draggable arguments
   const [speechNotes, setSpeechNotes] = useState<Record<string, string>>({});
-  const [arguments, setArguments] = useState<Argument[]>([]);
+  const [debateArguments, setDebateArguments] = useState<Argument[]>([]);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
   // Initialize template sections
@@ -52,7 +51,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       
       // Load arguments
       if (savedNotes.arguments) {
-        setArguments(savedNotes.arguments);
+        setDebateArguments(savedNotes.arguments);
       } else {
         // Initialize with one empty argument
         const initialArg = {
@@ -60,7 +59,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
           title: 'Argument 1',
           content: ''
         };
-        setArguments([initialArg]);
+        setDebateArguments([initialArg]);
         
         // Save the initial argument
         if (savedNotes) {
@@ -103,12 +102,12 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   const addArgument = () => {
     const newArg = {
       id: Date.now().toString(),
-      title: `Argument ${arguments.length + 1}`,
+      title: `Argument ${debateArguments.length + 1}`,
       content: ''
     };
     
-    const updatedArgs = [...arguments, newArg];
-    setArguments(updatedArgs);
+    const updatedArgs = [...debateArguments, newArg];
+    setDebateArguments(updatedArgs);
     
     // Save to localStorage
     const savedNotes = getNotes() || {
@@ -131,8 +130,8 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   };
   
   const deleteArgument = (id: string) => {
-    const updatedArgs = arguments.filter(arg => arg.id !== id);
-    setArguments(updatedArgs);
+    const updatedArgs = debateArguments.filter(arg => arg.id !== id);
+    setDebateArguments(updatedArgs);
     
     // Save to localStorage
     const savedNotes = getNotes();
@@ -143,7 +142,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   };
   
   const duplicateArgument = (id: string) => {
-    const argToDuplicate = arguments.find(arg => arg.id === id);
+    const argToDuplicate = debateArguments.find(arg => arg.id === id);
     if (argToDuplicate) {
       const newArg = {
         ...argToDuplicate,
@@ -151,8 +150,8 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         title: `${argToDuplicate.title} (Copy)`
       };
       
-      const updatedArgs = [...arguments, newArg];
-      setArguments(updatedArgs);
+      const updatedArgs = [...debateArguments, newArg];
+      setDebateArguments(updatedArgs);
       
       // Save to localStorage
       const savedNotes = getNotes();
@@ -164,11 +163,11 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   };
   
   const updateArgument = (id: string, content: string) => {
-    const updatedArgs = arguments.map(arg =>
+    const updatedArgs = debateArguments.map(arg =>
       arg.id === id ? { ...arg, content } : arg
     );
     
-    setArguments(updatedArgs);
+    setDebateArguments(updatedArgs);
     
     // Save to localStorage
     const savedNotes = getNotes();
@@ -191,7 +190,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     e.preventDefault();
     if (draggedItemIndex === null || draggedItemIndex === index) return;
     
-    const newArguments = [...arguments];
+    const newArguments = [...debateArguments];
     const draggedItem = newArguments[draggedItemIndex];
     
     // Remove the dragged item
@@ -200,7 +199,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     newArguments.splice(index, 0, draggedItem);
     
     setDraggedItemIndex(index);
-    setArguments(newArguments);
+    setDebateArguments(newArguments);
     
     // Save the new order to localStorage
     const savedNotes = getNotes();
@@ -208,7 +207,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       savedNotes.arguments = newArguments;
       saveNotes(savedNotes);
     }
-  }, [arguments, draggedItemIndex]);
+  }, [debateArguments, draggedItemIndex]);
 
   return (
     <div className="max-w-6xl mx-auto p-4">
@@ -314,7 +313,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             </div>
             
             <div className="space-y-4">
-              {arguments.map((arg, index) => (
+              {debateArguments.map((arg, index) => (
                 <div 
                   key={arg.id} 
                   onDragOver={(e) => handleDragOver(e, index)}
