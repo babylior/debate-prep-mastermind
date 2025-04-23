@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				debate: {
+					og: '#4CAF50', // Opening Government (green)
+					oo: '#2196F3', // Opening Opposition (blue)
+					cg: '#FFC107', // Closing Government (yellow)
+					co: '#F44336', // Closing Opposition (red)
+					neutral: '#607D8B' // Neutral color
 				}
 			},
 			borderRadius: {
@@ -84,11 +92,16 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'timer-pulse': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.6' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'timer-pulse': 'timer-pulse 2s ease-in-out infinite'
 			}
 		}
 	},
