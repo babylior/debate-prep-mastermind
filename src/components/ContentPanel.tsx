@@ -10,13 +10,13 @@ interface Content {
 }
 
 interface ContentPanelProps {
-  arguments: Content[];
+  argumentsList: Content[];
   rebuttals: Content[];
   framing: Content[];
 }
 
 const ContentPanel: React.FC<ContentPanelProps> = ({
-  arguments,
+  argumentsList,
   rebuttals,
   framing
 }) => {
@@ -25,7 +25,7 @@ const ContentPanel: React.FC<ContentPanelProps> = ({
       <section>
         <h3 className="font-semibold mb-3">Arguments</h3>
         <div className="space-y-2">
-          {arguments.map((arg) => (
+          {argumentsList.map((arg) => (
             <DraggableContentCard key={arg.id} {...arg} />
           ))}
         </div>

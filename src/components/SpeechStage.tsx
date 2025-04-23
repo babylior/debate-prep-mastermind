@@ -38,16 +38,14 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   ]);
   
   const [content, setContent] = useState({
-    arguments: [],
+    argumentsList: [],
     rebuttals: [],
     framing: []
   });
 
-  // Load content from previous stages
   useEffect(() => {
     const savedNotes = getNotes();
     if (savedNotes) {
-      // Load arguments
       if (savedNotes.prepArguments) {
         const prepArgs = savedNotes.prepArguments.map(arg => ({
           id: arg.id,
@@ -55,10 +53,9 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
           content: `${arg.whyTrue}\n${arg.mechanism}\n${arg.impact}`,
           type: 'argument' as const
         }));
-        setContent(prev => ({ ...prev, arguments: prepArgs }));
+        setContent(prev => ({ ...prev, argumentsList: prepArgs }));
       }
       
-      // Load rebuttals
       if (savedNotes.teamNotes) {
         const rebuttals = Object.entries(savedNotes.teamNotes)
           .filter(([_, value]) => value)
@@ -71,7 +68,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         setContent(prev => ({ ...prev, rebuttals }));
       }
       
-      // Load framing from listening stage
       if (savedNotes.listening?.keyPoints) {
         const framing = [{
           id: 'framing-1',
@@ -97,7 +93,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
 
   const handleDrop = (sectionIndex: number, itemId: string) => {
     const allContent = [
-      ...content.arguments,
+      ...content.argumentsList,
       ...content.rebuttals,
       ...content.framing
     ];
@@ -118,7 +114,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       
       setSections(updatedSections);
       
-      // Save to localStorage
       const savedNotes = getNotes();
       if (savedNotes) {
         savedNotes.speech = { sections: updatedSections };
@@ -167,7 +162,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
               </CardHeader>
               <CardContent>
                 <ContentPanel
-                  arguments={content.arguments}
+                  argumentsList={content.argumentsList}
                   rebuttals={content.rebuttals}
                   framing={content.framing}
                 />
