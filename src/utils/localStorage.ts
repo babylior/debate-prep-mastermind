@@ -1,4 +1,3 @@
-
 // Types for storing debate notes
 export interface DebateNotes {
   motion: string;
@@ -6,6 +5,7 @@ export interface DebateNotes {
   prep: Record<string, string>;
   listening: Record<string, string>;
   speech: Record<string, string>;
+  roadmap?: string;
   lastUpdated: number;
   arguments?: Array<{
     id: string;
@@ -37,7 +37,6 @@ export interface DebateNotes {
     co: string;
   };
   interactivePrompts?: Array<{id: string, question: string, answer: string, rebuttal: string}>;
-  speechRoadmap?: string;
 }
 
 // Get notes from local storage

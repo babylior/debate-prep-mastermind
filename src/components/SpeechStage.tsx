@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,35 +28,26 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
   
-  // State for regular speech notes and draggable arguments
+  const [roadmap, setRoadmap] = useState<string>('');
   const [speechNotes, setSpeechNotes] = useState<Record<string, string>>({});
   const [debateArguments, setDebateArguments] = useState<Argument[]>([]);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
-  // Initialize template sections
   const templateSections = roleData.speech.templateSections || [];
   
-  // Initialize notes from localStorage
   useEffect(() => {
     const savedNotes = getNotes();
     if (savedNotes) {
-      // Load speech notes
       if (savedNotes.speech) {
         setSpeechNotes(savedNotes.speech);
-      } else {
-        // Initialize with empty sections
-        const initial: Record<string, string> = {};
-        templateSections.forEach(section => {
-          initial[section.name] = '';
-        });
-        setSpeechNotes(initial);
+      }
+      if (savedNotes.roadmap) {
+        setRoadmap(savedNotes.roadmap);
       }
       
-      // Load arguments
       if (savedNotes.arguments) {
         setDebateArguments(savedNotes.arguments);
       } else {
-        // Initialize with one empty argument
         const initialArg: Argument = {
           id: Date.now().toString(),
           claim: '',
@@ -68,7 +58,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         };
         setDebateArguments([initialArg]);
         
-        // Save the initial argument
         if (savedNotes) {
           savedNotes.arguments = [initialArg];
           saveNotes(savedNotes);
@@ -77,6 +66,22 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     }
   }, [role, templateSections]);
 
+  const handleRoadmapChange = (value: string) => {
+    setRoadmap(value);
+    
+    const savedNotes = getNotes() || {
+      motion,
+      role,
+      prep: {},
+      listening: {},
+      speech: {},
+      lastUpdated: Date.now()
+    };
+    
+    savedNotes.roadmap = value;
+    saveNotes(savedNotes);
+  };
+
   const handleNoteChange = (key: string, value: string) => {
     const updatedNotes = {
       ...speechNotes,
@@ -84,7 +89,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     };
     setSpeechNotes(updatedNotes);
     
-    // Save to localStorage
     const savedNotes = getNotes() || {
       motion,
       role,
@@ -105,7 +109,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     });
   };
   
-  // Argument functions
   const addArgument = () => {
     const newArg: Argument = {
       id: Date.now().toString(),
@@ -119,7 +122,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     const updatedArgs = [...debateArguments, newArg];
     setDebateArguments(updatedArgs);
     
-    // Save to localStorage
     const savedNotes = getNotes() || {
       motion,
       role,
@@ -132,7 +134,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     savedNotes.arguments = updatedArgs;
     saveNotes(savedNotes);
     
-    // Show feedback
     toast({
       title: "Argument added",
       description: "A new argument card has been added."
@@ -143,7 +144,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     const updatedArgs = debateArguments.filter(arg => arg.id !== id);
     setDebateArguments(updatedArgs);
     
-    // Save to localStorage
     const savedNotes = getNotes();
     if (savedNotes) {
       savedNotes.arguments = updatedArgs;
@@ -162,7 +162,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       const updatedArgs = [...debateArguments, newArg];
       setDebateArguments(updatedArgs);
       
-      // Save to localStorage
       const savedNotes = getNotes();
       if (savedNotes) {
         savedNotes.arguments = updatedArgs;
@@ -182,7 +181,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     
     setDebateArguments(updatedArgs);
     
-    // Save to localStorage
     const savedNotes = getNotes();
     if (savedNotes) {
       savedNotes.arguments = updatedArgs;
@@ -190,7 +188,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     }
   };
   
-  // Drag and drop handlers
   const handleDragStart = (index: number) => {
     setDraggedItemIndex(index);
   };
@@ -206,15 +203,12 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     const newArguments = [...debateArguments];
     const draggedItem = newArguments[draggedItemIndex];
     
-    // Remove the dragged item
     newArguments.splice(draggedItemIndex, 1);
-    // Insert it at the new position
     newArguments.splice(index, 0, draggedItem);
     
     setDraggedItemIndex(index);
     setDebateArguments(newArguments);
     
-    // Save the new order to localStorage
     const savedNotes = getNotes();
     if (savedNotes) {
       savedNotes.arguments = newArguments;
@@ -241,10 +235,9 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Timer and Instructions */}
         <div className="lg:col-span-1 space-y-6">
           <Timer 
-            initialTime={7 * 60} // 7 minutes in seconds
+            initialTime={7 * 60}
             timerLabel="Speech Time"
             onComplete={handleTimerComplete}
           />
@@ -291,17 +284,32 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
           </Card>
         </div>
         
-        {/* Right Column - Speech Builder */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Speech Builder</h2>
           </div>
           
-          {/* Template sections */}
+          <Card>
+            <CardHeader>
+              <CardTitle>🗺️ Speech Roadmap</CardTitle>
+              <CardDescription>Plan the structure and flow of your speech</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <textarea
+                className="w-full min-h-[100px] p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Outline what you'll cover in this speech..."
+                value={roadmap}
+                onChange={(e) => handleRoadmapChange(e.target.value)}
+              />
+            </CardContent>
+          </Card>
+          
           {templateSections.map((section, idx) => (
             <Card key={idx}>
               <CardHeader>
-                <CardTitle>{section.name}</CardTitle>
+                <CardTitle>
+                  {section.name !== 'Opening' && '🚩 '}{section.name}
+                </CardTitle>
                 <CardDescription>{section.duration} - {section.description}</CardDescription>
               </CardHeader>
               <CardContent>
@@ -315,7 +323,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             </Card>
           ))}
           
-          {/* Arguments section */}
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Arguments</h2>
