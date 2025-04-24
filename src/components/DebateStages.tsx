@@ -9,6 +9,7 @@ import { getNotes, getMotion, saveNotes } from '@/utils/localStorage';
 import NavigationBar from './NavigationBar';
 import FeedbackButton from './FeedbackButton';
 import ListeningStage from './ListeningStage';
+import { Button } from "@/components/ui/button";
 
 interface DebateStagesProps {
   selectedRole: string;
@@ -30,9 +31,9 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
     
     // If we have saved notes and they match the current motion, we may want to skip to a later stage
     if (savedNotes && savedMotion === motion) {
-      if (Object.keys(savedNotes.speech || {}).length > 0) {
+      if (savedNotes.speech && savedNotes.speech.sections) {
         setActiveStage('speech');
-      } else if (Object.keys(savedNotes.listening || {}).length > 0) {
+      } else if (savedNotes.listening && savedNotes.listening.keyPoints) {
         setActiveStage('listening');
       }
     }
@@ -118,6 +119,3 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
 };
 
 export default DebateStages;
-
-// We need to import the Button component
-import { Button } from "@/components/ui/button";

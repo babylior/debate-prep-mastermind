@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,13 +83,18 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     const savedNotes = getNotes();
     if (savedNotes) {
       if (savedNotes.speech && savedNotes.speech.sections) {
-        const savedSections = typeof savedNotes.speech.sections === 'string' 
-          ? JSON.parse(savedNotes.speech.sections as string) as Section[]
-          : savedNotes.speech.sections as Section[];
-        
-        if (Array.isArray(savedSections)) {
-          setSections(savedSections);
-        } else {
+        // Fix: Parse string to array if it's a string, otherwise use it directly
+        try {
+          const savedSections = typeof savedNotes.speech.sections === 'string' 
+            ? JSON.parse(savedNotes.speech.sections) as Section[]
+            : savedNotes.speech.sections as Section[];
+          
+          if (Array.isArray(savedSections)) {
+            setSections(savedSections);
+          } else {
+            setSections(getDefaultSections());
+          }
+        } catch (e) {
           setSections(getDefaultSections());
         }
       } else {
@@ -186,7 +192,9 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       
       const savedNotes = getNotes();
       if (savedNotes) {
-        savedNotes.speech = { ...savedNotes.speech, sections: updatedSections };
+        // Fix: Stringify sections array before saving
+        const sectionsToSave = JSON.stringify(updatedSections);
+        savedNotes.speech = { ...savedNotes.speech, sections: sectionsToSave };
         saveNotes(savedNotes);
       }
     }
@@ -199,7 +207,9 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     
     const savedNotes = getNotes();
     if (savedNotes) {
-      savedNotes.speech = { ...savedNotes.speech, sections: updatedSections };
+      // Fix: Stringify sections array before saving
+      const sectionsToSave = JSON.stringify(updatedSections);
+      savedNotes.speech = { ...savedNotes.speech, sections: sectionsToSave };
       saveNotes(savedNotes);
     }
   };
