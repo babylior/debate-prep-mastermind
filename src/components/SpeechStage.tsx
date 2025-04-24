@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -83,13 +82,21 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     const savedNotes = getNotes();
     if (savedNotes) {
       if (savedNotes.speech && savedNotes.speech.sections) {
-        setSections(savedNotes.speech.sections as Section[]);
+        const savedSections = typeof savedNotes.speech.sections === 'string' 
+          ? JSON.parse(savedNotes.speech.sections as string) as Section[]
+          : savedNotes.speech.sections as Section[];
+        
+        if (Array.isArray(savedSections)) {
+          setSections(savedSections);
+        } else {
+          setSections(getDefaultSections());
+        }
       } else {
         setSections(getDefaultSections());
       }
       
       if (savedNotes.prepArguments) {
-        const prepArgs = savedNotes.prepArguments.map(arg => ({
+        const prepArgs = savedNotes.prepArguments.map((arg: any) => ({
           id: arg.id,
           title: arg.claim,
           content: `${arg.whyTrue}\n${arg.mechanism}\n${arg.impact}`,
@@ -104,7 +111,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
           .map(([team, rebuttal], index) => ({
             id: `rebuttal-${index}`,
             title: `Rebuttal to ${team.toUpperCase()}`,
-            content: rebuttal,
+            content: rebuttal as string,
             type: 'rebuttal' as const
           }));
         setContent(prev => ({ ...prev, rebuttals }));
@@ -122,14 +129,12 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     }
   }, [role]);
 
-  // Sort sections based on requirements
   const getSortedSections = () => {
     const openingSections = sections.filter(section => section.type === 'opening');
     const rebuttalSections = sections.filter(section => section.type === 'rebuttal');
     const argumentSections = sections.filter(section => section.type === 'argument' || section.type === 'extension');
     const conclusionSections = sections.filter(section => section.type === 'conclusion');
     
-    // Start with framing from content if available
     const framingSections: Section[] = content.framing.map(frame => ({
       title: frame.title,
       content: frame.content,
@@ -181,7 +186,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       
       const savedNotes = getNotes();
       if (savedNotes) {
-        savedNotes.speech = { sections: updatedSections };
+        savedNotes.speech = { ...savedNotes.speech, sections: updatedSections };
         saveNotes(savedNotes);
       }
     }
@@ -194,7 +199,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     
     const savedNotes = getNotes();
     if (savedNotes) {
-      savedNotes.speech = { sections: updatedSections };
+      savedNotes.speech = { ...savedNotes.speech, sections: updatedSections };
       saveNotes(savedNotes);
     }
   };

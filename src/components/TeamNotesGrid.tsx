@@ -1,10 +1,13 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { getNotes, saveNotes } from "@/utils/localStorage";
+import { useToast } from "@/components/ui/use-toast";
 
 interface TeamNotesGridProps {
-  notes: {
+  notes?: {
     og: string;
     oo: string;
     cg: string;
@@ -18,7 +21,9 @@ interface TeamNotesGridProps {
     cgComparison?: string;
     coComparison?: string;
   };
-  onChange: (team: keyof TeamNotes, value: string) => void;
+  onChange?: (team: keyof TeamNotes, value: string) => void;
+  role?: string;
+  motion?: string;
 }
 
 interface TeamNotes {
@@ -36,7 +41,66 @@ interface TeamNotes {
     coComparison?: string;
 }
 
-const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
+const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes: propNotes, onChange: propOnChange, role, motion }) => {
+  const { toast } = useToast();
+  const [internalNotes, setInternalNotes] = useState<TeamNotes>({
+    og: '',
+    oo: '',
+    cg: '',
+    co: '',
+    ogRebuttal: '',
+    ooRebuttal: '',
+    cgRebuttal: '',
+    coComparison: '',
+    cgComparison: '',
+    coRebuttal: '',
+    ogComparison: '',
+    ooComparison: ''
+  });
+
+  // Load notes from localStorage if no notes prop is provided
+  useEffect(() => {
+    if (propNotes) {
+      setInternalNotes(propNotes);
+    } else if (role && motion) {
+      const savedNotes = getNotes();
+      if (savedNotes && savedNotes.teamNotes) {
+        setInternalNotes(savedNotes.teamNotes);
+      }
+    }
+  }, [propNotes, role, motion]);
+
+  const handleChange = (team: keyof TeamNotes, value: string) => {
+    const updatedNotes = {
+      ...internalNotes,
+      [team]: value
+    };
+    
+    setInternalNotes(updatedNotes);
+    
+    if (propOnChange) {
+      propOnChange(team, value);
+    } else if (role && motion) {
+      // If no onChange prop, save directly to localStorage
+      const savedNotes = getNotes() || {
+        motion,
+        role,
+        prep: {},
+        listening: {},
+        speech: {},
+        lastUpdated: Date.now()
+      };
+      
+      savedNotes.teamNotes = updatedNotes;
+      saveNotes(savedNotes);
+      
+      toast({
+        title: "Notes saved",
+        description: `Your notes for ${team.toUpperCase()} have been saved.`
+      });
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {['og', 'oo', 'cg', 'co'].map((team) => (
@@ -55,28 +119,31 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
             <div>
               <Label>Arguments & Points</Label>
               <Textarea
-                value={notes[team]}
-                onChange={(e) => onChange(team as keyof typeof notes, e.target.value)}
+                value={internalNotes[team as keyof TeamNotes] || ''}
+                onChange={(e) => handleChange(team as keyof TeamNotes, e.target.value)}
                 className="min-h-[100px] resize-vertical"
                 placeholder={`Note key arguments from ${team.toUpperCase()}...`}
+                autoResize
               />
             </div>
             <div>
               <Label>Your Rebuttal</Label>
               <Textarea
-                value={notes[`${team}Rebuttal`] || ''}
-                onChange={(e) => onChange(`${team}Rebuttal` as keyof typeof notes, e.target.value)}
+                value={internalNotes[`${team}Rebuttal` as keyof TeamNotes] || ''}
+                onChange={(e) => handleChange(`${team}Rebuttal` as keyof TeamNotes, e.target.value)}
                 className="min-h-[100px] resize-vertical"
                 placeholder="How would you respond to this speaker's case?"
+                autoResize
               />
             </div>
             <div>
               <Label>Case Comparison</Label>
               <Textarea
-                value={notes[`${team}Comparison`] || ''}
-                onChange={(e) => onChange(`${team}Comparison` as keyof typeof notes, e.target.value)}
+                value={internalNotes[`${team}Comparison` as keyof TeamNotes] || ''}
+                onChange={(e) => handleChange(`${team}Comparison` as keyof TeamNotes, e.target.value)}
                 className="min-h-[100px] resize-vertical"
                 placeholder="How does your case compare to theirs?"
+                autoResize
               />
             </div>
           </CardContent>

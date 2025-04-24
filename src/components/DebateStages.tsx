@@ -8,6 +8,7 @@ import { debateRoles, DebateRole } from '@/utils/debateData';
 import { getNotes, getMotion, saveNotes } from '@/utils/localStorage';
 import NavigationBar from './NavigationBar';
 import FeedbackButton from './FeedbackButton';
+import ListeningStage from './ListeningStage';
 
 interface DebateStagesProps {
   selectedRole: string;
@@ -97,25 +98,11 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
         </TabsContent>
         
         <TabsContent value="listening" className="m-0 mt-0">
-          <div className="max-w-6xl mx-auto p-4">
-            <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
-              <h1 className="text-2xl font-bold mb-2">Listening Stage</h1>
-              <p className="text-gray-600">Take notes about other teams' speeches</p>
-            </div>
-            
-            <div className="mt-6">
-              <TeamNotesGrid role={role} motion={motion} />
-            </div>
-            
-            <div className="mt-8 flex justify-end">
-              <Button 
-                onClick={handleListeningComplete}
-                className="bg-primary hover:bg-primary/90"
-              >
-                Continue to Speech
-              </Button>
-            </div>
-          </div>
+          <ListeningStage
+            role={role}
+            motion={motion}
+            onComplete={handleListeningComplete}
+          />
         </TabsContent>
         
         <TabsContent value="speech" className="m-0 mt-0">
