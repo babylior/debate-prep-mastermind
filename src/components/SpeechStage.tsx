@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,9 @@ import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
 import SpeechStructurePanel from "./SpeechStructurePanel";
 import ContentPanel from "./ContentPanel";
+import PromptsSidebar from "./PromptsSidebar";
+import { Lightbulb } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 interface SpeechStageProps {
   role: string;
@@ -29,6 +33,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   
   const [isEditMode, setIsEditMode] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
+  const [showPrompts, setShowPrompts] = useState(false);
   
   const getDefaultSections = (): Section[] => {
     if (role === 'pm' || role === 'lo') {
@@ -77,7 +82,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   useEffect(() => {
     const savedNotes = getNotes();
     if (savedNotes) {
-      if (savedNotes.speech?.sections) {
+      if (savedNotes.speech && savedNotes.speech.sections) {
         setSections(savedNotes.speech.sections as Section[]);
       } else {
         setSections(getDefaultSections());
@@ -116,6 +121,29 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       }
     }
   }, [role]);
+
+  // Sort sections based on requirements
+  const getSortedSections = () => {
+    const openingSections = sections.filter(section => section.type === 'opening');
+    const rebuttalSections = sections.filter(section => section.type === 'rebuttal');
+    const argumentSections = sections.filter(section => section.type === 'argument' || section.type === 'extension');
+    const conclusionSections = sections.filter(section => section.type === 'conclusion');
+    
+    // Start with framing from content if available
+    const framingSections: Section[] = content.framing.map(frame => ({
+      title: frame.title,
+      content: frame.content,
+      type: 'opening'
+    }));
+    
+    return [
+      ...framingSections, 
+      ...openingSections, 
+      ...rebuttalSections, 
+      ...argumentSections,
+      ...conclusionSections
+    ];
+  };
 
   const handleModeToggle = () => {
     setIsEditMode(!isEditMode);
@@ -171,6 +199,10 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     }
   };
 
+  const togglePromptsSidebar = () => {
+    setShowPrompts(!showPrompts);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
@@ -179,7 +211,17 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             <h1 className="text-2xl font-bold">{roleData.speech.title}</h1>
             <p className="text-gray-600 mt-1">{motion}</p>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex space-x-3 items-center">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" className="h-8 w-8">
+                  <Lightbulb className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <PromptsSidebar />
+              </PopoverContent>
+            </Popover>
             <ExportButton />
             <Button variant="outline" onClick={onReset}>
               Start Over
@@ -194,6 +236,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             isEditMode={isEditMode}
             currentSection={currentSection}
             sections={sections}
+            sortedSections={getSortedSections()}
             onModeToggle={handleModeToggle}
             onNextSection={handleNextSection}
             onDrop={handleDrop}

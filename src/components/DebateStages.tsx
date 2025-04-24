@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PrepStage from './PrepStage';
-import ListeningStage from './ListeningStage';
+import TeamNotesGrid from './TeamNotesGrid';
 import SpeechStage from './SpeechStage';
 import { debateRoles, DebateRole } from '@/utils/debateData';
-import { getNotes, getMotion } from '@/utils/localStorage';
+import { getNotes, getMotion, saveNotes } from '@/utils/localStorage';
 import NavigationBar from './NavigationBar';
+import FeedbackButton from './FeedbackButton';
 
 interface DebateStagesProps {
   selectedRole: string;
@@ -48,17 +49,34 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
     setActiveStage('speech');
   };
 
+  // Initialize listening notes if not already present
+  useEffect(() => {
+    const savedNotes = getNotes();
+    if (savedNotes && !savedNotes.listening) {
+      savedNotes.listening = { keyPoints: '' };
+      saveNotes(savedNotes);
+    }
+  }, []);
+
   return (
     <div className="w-full">
       {/* Team and motion info at the top */}
-      <div className="hidden lg:flex items-center mb-6">
-        <div className={`${teamColor} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3`}>
-          {currentRole?.name || ''}
+      <div className="hidden lg:flex items-center mb-6 justify-between">
+        <div className="flex items-center">
+          <div className={`${teamColor} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3`}>
+            {currentRole?.name || ''}
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">{currentRole?.fullName}</h1>
+            <p className="text-gray-600">{motion}</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">{currentRole?.fullName}</h1>
-          <p className="text-gray-600">{motion}</p>
-        </div>
+        
+        {activeStage === 'speech' && (
+          <div>
+            <FeedbackButton role={role} motion={motion} />
+          </div>
+        )}
       </div>
       
       {/* Persistent navigation bar */}
@@ -79,11 +97,25 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
         </TabsContent>
         
         <TabsContent value="listening" className="m-0 mt-0">
-          <ListeningStage 
-            role={role} 
-            motion={motion} 
-            onComplete={handleListeningComplete} 
-          />
+          <div className="max-w-6xl mx-auto p-4">
+            <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+              <h1 className="text-2xl font-bold mb-2">Listening Stage</h1>
+              <p className="text-gray-600">Take notes about other teams' speeches</p>
+            </div>
+            
+            <div className="mt-6">
+              <TeamNotesGrid role={role} motion={motion} />
+            </div>
+            
+            <div className="mt-8 flex justify-end">
+              <Button 
+                onClick={handleListeningComplete}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Continue to Speech
+              </Button>
+            </div>
+          </div>
         </TabsContent>
         
         <TabsContent value="speech" className="m-0 mt-0">
@@ -99,3 +131,6 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
 };
 
 export default DebateStages;
+
+// We need to import the Button component
+import { Button } from "@/components/ui/button";

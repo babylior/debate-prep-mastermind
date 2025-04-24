@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,6 +17,7 @@ interface SpeechStructurePanelProps {
   isEditMode: boolean;
   currentSection: number;
   sections: Section[];
+  sortedSections: Section[];
   onModeToggle: () => void;
   onNextSection: () => void;
   onDrop: (sectionIndex: number, itemId: string) => void;
@@ -27,11 +28,14 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
   isEditMode,
   currentSection,
   sections,
+  sortedSections,
   onModeToggle,
   onNextSection,
   onDrop,
   onSectionContentChange
 }) => {
+  const textareaRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
+
   const handleDrop = (e: React.DragEvent, sectionIndex: number) => {
     e.preventDefault();
     const itemId = e.dataTransfer.getData('text/plain');
@@ -44,7 +48,24 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
     onSectionContentChange(index, e.target.value);
+    // Auto-resize the textarea
+    autoResizeTextarea(e.target);
   };
+
+  // Function to auto-resize textareas
+  const autoResizeTextarea = (element: HTMLTextAreaElement) => {
+    element.style.height = 'auto';
+    element.style.height = `${element.scrollHeight}px`;
+  };
+
+  // Set up auto-resizing for all textareas
+  useEffect(() => {
+    textareaRefs.current.forEach(textarea => {
+      if (textarea) {
+        autoResizeTextarea(textarea);
+      }
+    });
+  }, [sections, isEditMode]);
 
   return (
     <div className="relative">
@@ -73,10 +94,12 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
               </CardHeader>
               <CardContent>
                 <Textarea 
+                  ref={el => textareaRefs.current[index] = el}
                   value={section.content} 
                   onChange={(e) => handleContentChange(e, index)}
                   placeholder="Drop content here or type directly"
-                  className="min-h-[120px]"
+                  className="min-h-[120px] overflow-hidden resize-none"
+                  style={{ height: 'auto' }}
                 />
               </CardContent>
             </Card>
@@ -101,7 +124,7 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-8">
-                {sections.map((section, index) => (
+                {sortedSections.map((section, index) => (
                   <div key={index} className="mb-8">
                     <h2 className="text-xl font-bold mb-3">{section.title}</h2>
                     <div className="whitespace-pre-wrap text-lg">
