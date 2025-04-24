@@ -2,14 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PrepStage from './PrepStage';
-import TeamNotesGrid from './TeamNotesGrid';
+import ListeningStage from './ListeningStage';
 import SpeechStage from './SpeechStage';
 import { debateRoles, DebateRole } from '@/utils/debateData';
-import { getNotes, getMotion, saveNotes } from '@/utils/localStorage';
+import { getNotes, getMotion } from '@/utils/localStorage';
 import NavigationBar from './NavigationBar';
-import FeedbackButton from './FeedbackButton';
-import ListeningStage from './ListeningStage';
-import { Button } from "@/components/ui/button";
 
 interface DebateStagesProps {
   selectedRole: string;
@@ -31,9 +28,9 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
     
     // If we have saved notes and they match the current motion, we may want to skip to a later stage
     if (savedNotes && savedMotion === motion) {
-      if (savedNotes.speech && savedNotes.speech.sections) {
+      if (Object.keys(savedNotes.speech || {}).length > 0) {
         setActiveStage('speech');
-      } else if (savedNotes.listening && savedNotes.listening.keyPoints) {
+      } else if (Object.keys(savedNotes.listening || {}).length > 0) {
         setActiveStage('listening');
       }
     }
@@ -51,34 +48,17 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
     setActiveStage('speech');
   };
 
-  // Initialize listening notes if not already present
-  useEffect(() => {
-    const savedNotes = getNotes();
-    if (savedNotes && !savedNotes.listening) {
-      savedNotes.listening = { keyPoints: '' };
-      saveNotes(savedNotes);
-    }
-  }, []);
-
   return (
     <div className="w-full">
       {/* Team and motion info at the top */}
-      <div className="hidden lg:flex items-center mb-6 justify-between">
-        <div className="flex items-center">
-          <div className={`${teamColor} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3`}>
-            {currentRole?.name || ''}
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">{currentRole?.fullName}</h1>
-            <p className="text-gray-600">{motion}</p>
-          </div>
+      <div className="hidden lg:flex items-center mb-6">
+        <div className={`${teamColor} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3`}>
+          {currentRole?.name || ''}
         </div>
-        
-        {activeStage === 'speech' && (
-          <div>
-            <FeedbackButton role={role} motion={motion} />
-          </div>
-        )}
+        <div>
+          <h1 className="text-2xl font-bold">{currentRole?.fullName}</h1>
+          <p className="text-gray-600">{motion}</p>
+        </div>
       </div>
       
       {/* Persistent navigation bar */}
@@ -99,10 +79,10 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
         </TabsContent>
         
         <TabsContent value="listening" className="m-0 mt-0">
-          <ListeningStage
-            role={role}
-            motion={motion}
-            onComplete={handleListeningComplete}
+          <ListeningStage 
+            role={role} 
+            motion={motion} 
+            onComplete={handleListeningComplete} 
           />
         </TabsContent>
         
