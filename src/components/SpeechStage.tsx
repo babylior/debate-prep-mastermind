@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
 import SpeechStructurePanel from "./SpeechStructurePanel";
 import ContentPanel from "./ContentPanel";
+import { StatusBar } from "@/components/ui/status-bar";
 
 interface SpeechStageProps {
   role: string;
@@ -49,6 +49,8 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     rebuttals: [],
     framing: []
   });
+
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   useEffect(() => {
     const savedNotes = getNotes();
@@ -99,6 +101,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   };
 
   const handleDrop = (sectionIndex: number, itemId: string) => {
+    setSaveStatus('saving');
     const allContent = [
       ...content.argumentsList,
       ...content.rebuttals,
@@ -121,11 +124,21 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       
       setSections(updatedSections);
       
-      const savedNotes = getNotes();
-      if (savedNotes) {
-        // Store sections as a serialized object
-        savedNotes.speech = { sectionsData: JSON.stringify(updatedSections) };
-        saveNotes(savedNotes);
+      try {
+        const savedNotes = getNotes();
+        if (savedNotes) {
+          savedNotes.speech = { sectionsData: JSON.stringify(updatedSections) };
+          saveNotes(savedNotes);
+          setSaveStatus('saved');
+          setTimeout(() => setSaveStatus('idle'), 2000);
+        }
+      } catch (error) {
+        setSaveStatus('error');
+        toast({
+          variant: "destructive",
+          title: "Error saving speech",
+          description: "There was a problem saving your speech content. Please try again."
+        });
       }
     }
   };
@@ -179,6 +192,8 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
           </div>
         )}
       </div>
+
+      <StatusBar status={saveStatus} />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole, debateRoles } from "@/utils/debateData";
 import TeamNotesGrid from './TeamNotesGrid';
 import { useToast } from "@/components/ui/use-toast";
+import { StatusBar } from "@/components/ui/status-bar";
 
 interface ListeningStageProps {
   role: string;
@@ -25,12 +25,12 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
     cg: '',
     co: ''
   });
+
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   
-  // Initialize notes from localStorage
   useEffect(() => {
     const savedNotes = getNotes();
     if (savedNotes) {
-      // Load team notes if they exist
       if (savedNotes.teamNotes) {
         setTeamNotes({
           og: savedNotes.teamNotes.og || '',
@@ -43,17 +43,25 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
   }, [role, motion]);
 
   const handleTeamNoteChange = (team: 'og' | 'oo' | 'cg' | 'co', value: string) => {
+    setSaveStatus('saving');
     const updatedTeamNotes = {
       ...teamNotes,
       [team]: value
     };
     setTeamNotes(updatedTeamNotes);
-    saveToLocalStorage('teamNotes', updatedTeamNotes);
     
-    toast({
-      title: "Notes saved",
-      description: `Your notes for ${team.toUpperCase()} have been saved.`
-    });
+    try {
+      saveToLocalStorage('teamNotes', updatedTeamNotes);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch (error) {
+      setSaveStatus('error');
+      toast({
+        variant: "destructive",
+        title: "Error saving notes",
+        description: "There was a problem saving your notes. Please try again."
+      });
+    }
   };
 
   const saveToLocalStorage = (key: string, data: any) => {
@@ -90,6 +98,8 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
           Continue to Speech Stage
         </Button>
       </div>
+
+      <StatusBar status={saveStatus} />
     </div>
   );
 };
