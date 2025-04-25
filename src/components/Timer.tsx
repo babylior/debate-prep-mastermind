@@ -8,9 +8,10 @@ interface TimerProps {
   timerLabel: string;
   onComplete?: () => void;
   autoStart?: boolean;
+  className?: string; // Add this line to accept className
 }
 
-const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, autoStart = false }) => {
+const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, autoStart = false, className }) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(autoStart);
 
@@ -63,7 +64,7 @@ const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, auto
   };
 
   return (
-    <div className="w-full bg-white rounded-lg shadow p-4 sticky top-24">
+    <div className={`w-full bg-white rounded-lg shadow p-4 sticky top-24 ${className || ''}`}>
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium text-gray-700">{timerLabel}</h3>
         <span className={`text-xl font-bold ${timeLeft < 60 ? 'text-red-600 animate-pulse' : ''}`}>

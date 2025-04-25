@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,17 +25,23 @@ interface Argument {
   weighing: string;
 }
 
+interface Section {
+  title: string;
+  content: string;
+  type: 'opening' | 'argument' | 'rebuttal' | 'conclusion';
+}
+
 const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
   
   const [isEditMode, setIsEditMode] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
-  const [sections, setSections] = useState([
-    { title: 'Opening', content: '', type: 'opening' as const },
-    { title: 'Arguments', content: '', type: 'argument' as const },
-    { title: 'Rebuttals', content: '', type: 'rebuttal' as const },
-    { title: 'Conclusion', content: '', type: 'conclusion' as const }
+  const [sections, setSections] = useState<Section[]>([
+    { title: 'Opening', content: '', type: 'opening' },
+    { title: 'Arguments', content: '', type: 'argument' },
+    { title: 'Rebuttals', content: '', type: 'rebuttal' },
+    { title: 'Conclusion', content: '', type: 'conclusion' }
   ]);
   
   const [content, setContent] = useState({
@@ -116,7 +123,8 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       
       const savedNotes = getNotes();
       if (savedNotes) {
-        savedNotes.speech = { sections: updatedSections };
+        // Store sections as a serialized object
+        savedNotes.speech = { sectionsData: JSON.stringify(updatedSections) };
         saveNotes(savedNotes);
       }
     }
