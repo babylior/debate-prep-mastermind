@@ -95,10 +95,10 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         setContent(prev => ({ ...prev, rebuttals }));
       }
       
-      // Load framing content
+      // Load framing content - Fix type error by ensuring id is a string
       if (savedNotes.prep?.framing) {
         const framing = [{
-          id: 'framing-1',
+          id: 'framing-1', // Ensure this is a string
           title: 'Framing',
           content: savedNotes.prep.framing,
           type: 'framing' as const
@@ -107,7 +107,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       } else if (savedNotes.prep?.problem) {
         // Fallback to problem definition if framing isn't available
         const framing = [{
-          id: 'framing-1',
+          id: 'framing-1', // Ensure this is a string
           title: 'Key Context',
           content: savedNotes.prep.problem,
           type: 'framing' as const
