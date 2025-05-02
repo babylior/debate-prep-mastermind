@@ -64,7 +64,16 @@ const ReviewLocations: React.FC = () => {
     setReviews(updatedReviews);
     
     try {
-      const savedNotes = getNotes() || {};
+      // Fix: Initialize with proper DebateNotes structure if not exist
+      const savedNotes = getNotes() || {
+        motion: '',
+        role: '',
+        prep: {},
+        listening: {},
+        speech: {},
+        lastUpdated: Date.now()
+      };
+      
       savedNotes.reviews = updatedReviews;
       saveNotes(savedNotes);
       setSaveStatus('saved');
@@ -101,7 +110,16 @@ const ReviewLocations: React.FC = () => {
     
     // Save to localStorage
     try {
-      const savedNotes = getNotes() || {};
+      // Fix: Initialize with proper DebateNotes structure if not exist
+      const savedNotes = getNotes() || {
+        motion: '',
+        role: '',
+        prep: {},
+        listening: {},
+        speech: {},
+        lastUpdated: Date.now()
+      };
+      
       savedNotes.teamPositions = updatedPositions;
       saveNotes(savedNotes);
       toast({

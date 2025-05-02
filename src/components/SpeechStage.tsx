@@ -72,10 +72,10 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         }
       }
       
-      // Load arguments
+      // Fixed type error: Converting number to string for id property
       if (savedNotes.prepArguments) {
         const prepArgs = savedNotes.prepArguments.map(arg => ({
-          id: arg.id,
+          id: String(arg.id), // Convert to string
           title: arg.claim,
           content: `${arg.whyTrue}\n${arg.mechanism}\n${arg.impact}`,
           type: 'argument' as const
