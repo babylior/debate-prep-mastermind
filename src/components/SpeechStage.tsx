@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,10 +71,10 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         }
       }
       
-      // Fixed type error: Converting number to string for id property
+      // Fixed type error: Ensure all ids are strings
       if (savedNotes.prepArguments) {
         const prepArgs = savedNotes.prepArguments.map(arg => ({
-          id: String(arg.id), // Convert to string
+          id: String(arg.id), // Convert to string explicitly
           title: arg.claim,
           content: `${arg.whyTrue}\n${arg.mechanism}\n${arg.impact}`,
           type: 'argument' as const
