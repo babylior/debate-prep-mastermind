@@ -7,9 +7,10 @@ export interface StatusBarProps {
   status: 'idle' | 'saving' | 'saved' | 'error';
   message?: string;
   className?: string;
+  position?: 'bottom' | 'top';
 }
 
-export function StatusBar({ status, message, className }: StatusBarProps) {
+export function StatusBar({ status, message, className, position = 'bottom' }: StatusBarProps) {
   const getStatusContent = () => {
     switch (status) {
       case 'saving':
@@ -23,11 +24,11 @@ export function StatusBar({ status, message, className }: StatusBarProps) {
         return (
           <>
             <Check className="h-4 w-4 text-green-500" />
-            <span>All changes saved</span>
+            <span>{message || 'All changes saved'}</span>
           </>
         );
       case 'error':
-        return <span className="text-red-500">Failed to save changes</span>;
+        return <span className="text-red-500">{message || 'Failed to save changes'}</span>;
       default:
         return null;
     }
@@ -37,7 +38,8 @@ export function StatusBar({ status, message, className }: StatusBarProps) {
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t px-4 py-2 transition-all duration-300 flex items-center justify-center gap-2 text-sm",
+      "fixed left-0 right-0 bg-white/80 backdrop-blur-sm border-t px-4 py-2 transition-all duration-300 flex items-center justify-center gap-2 text-sm z-50",
+      position === 'bottom' ? "bottom-0 border-t" : "top-0 border-b",
       className
     )}>
       {getStatusContent()}

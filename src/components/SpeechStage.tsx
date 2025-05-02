@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,10 +6,13 @@ import Timer from "@/components/Timer";
 import ExportButton from "@/components/ExportButton";
 import { useToast } from "@/components/ui/use-toast";
 import { getNotes, saveNotes } from "@/utils/localStorage";
-import { roleContent, DebateRole } from "@/utils/debateData";
+import { roleContent, DebateRole, debateRoles } from "@/utils/debateData";
 import SpeechStructurePanel from "./SpeechStructurePanel";
 import ContentPanel from "./ContentPanel";
+import ReviewLocations from "./ReviewLocations";
 import { StatusBar } from "@/components/ui/status-bar";
+import { Lightbulb } from "lucide-react";
+import TipsPanel from './TipsPanel';
 
 interface SpeechStageProps {
   role: string;
@@ -28,19 +32,21 @@ interface Argument {
 interface Section {
   title: string;
   content: string;
-  type: 'opening' | 'argument' | 'rebuttal' | 'conclusion';
+  type: 'opening' | 'roadmap' | 'rebuttal' | 'argument' | 'conclusion';
 }
 
 const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
+  const currentRole = debateRoles.find(r => r.id === role);
   
   const [isEditMode, setIsEditMode] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
   const [sections, setSections] = useState<Section[]>([
     { title: 'Opening', content: '', type: 'opening' },
-    { title: 'Arguments', content: '', type: 'argument' },
+    { title: 'Roadmap', content: '', type: 'roadmap' },
     { title: 'Rebuttals', content: '', type: 'rebuttal' },
+    { title: 'Arguments', content: '', type: 'argument' },
     { title: 'Conclusion', content: '', type: 'conclusion' }
   ]);
   
@@ -51,10 +57,22 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
   });
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [isTipsPanelOpen, setIsTipsPanelOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const savedNotes = getNotes();
     if (savedNotes) {
+      // Load saved speech sections if they exist
+      if (savedNotes.speech?.sectionsData) {
+        try {
+          const parsedSections = JSON.parse(savedNotes.speech.sectionsData);
+          setSections(parsedSections);
+        } catch (e) {
+          console.error("Error parsing saved sections", e);
+        }
+      }
+      
+      // Load arguments
       if (savedNotes.prepArguments) {
         const prepArgs = savedNotes.prepArguments.map(arg => ({
           id: arg.id,
@@ -65,6 +83,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         setContent(prev => ({ ...prev, argumentsList: prepArgs }));
       }
       
+      // Load rebuttals from team notes
       if (savedNotes.teamNotes) {
         const rebuttals = Object.entries(savedNotes.teamNotes)
           .filter(([_, value]) => value)
@@ -77,11 +96,21 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         setContent(prev => ({ ...prev, rebuttals }));
       }
       
-      if (savedNotes.listening?.keyPoints) {
+      // Load framing content
+      if (savedNotes.prep?.framing) {
         const framing = [{
           id: 'framing-1',
-          title: 'Key Points',
-          content: savedNotes.listening.keyPoints,
+          title: 'Framing',
+          content: savedNotes.prep.framing,
+          type: 'framing' as const
+        }];
+        setContent(prev => ({ ...prev, framing }));
+      } else if (savedNotes.prep?.problem) {
+        // Fallback to problem definition if framing isn't available
+        const framing = [{
+          id: 'framing-1',
+          title: 'Key Context',
+          content: savedNotes.prep.problem,
           type: 'framing' as const
         }];
         setContent(prev => ({ ...prev, framing }));
@@ -127,7 +156,10 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       try {
         const savedNotes = getNotes();
         if (savedNotes) {
-          savedNotes.speech = { sectionsData: JSON.stringify(updatedSections) };
+          savedNotes.speech = { 
+            sectionsData: JSON.stringify(updatedSections),
+            lastUpdated: Date.now()
+          };
           saveNotes(savedNotes);
           setSaveStatus('saved');
           setTimeout(() => setSaveStatus('idle'), 2000);
@@ -152,7 +184,20 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             <p className="text-gray-600 mt-1">{motion}</p>
           </div>
           <div className="flex space-x-3">
-            <ExportButton />
+            <Button 
+              variant="outline" 
+              onClick={() => setIsTipsPanelOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Lightbulb className="h-4 w-4" />
+              <span className="hidden sm:inline">Tips</span>
+            </Button>
+            <ReviewLocations />
+            <ExportButton 
+              motion={motion}
+              role={currentRole?.name || ''}
+              sections={sections}
+            />
             <Button variant="outline" onClick={onReset}>
               Start Over
             </Button>
@@ -169,6 +214,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             onModeToggle={handleModeToggle}
             onNextSection={handleNextSection}
             onDrop={handleDrop}
+            showTimer={true} // Enable 7-minute timer
           />
         </div>
         
@@ -192,6 +238,17 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
           </div>
         )}
       </div>
+
+      {/* Tips Panel */}
+      <TipsPanel 
+        role={role as DebateRole} 
+        content={{
+          instructions: roleData.speech.instructions || [],
+          tips: roleData.speech.tips || []
+        }}
+        isOpen={isTipsPanelOpen}
+        onClose={() => setIsTipsPanelOpen(false)}
+      />
 
       <StatusBar status={saveStatus} />
     </div>

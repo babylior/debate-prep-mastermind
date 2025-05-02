@@ -11,11 +11,12 @@ interface SpeechStructurePanelProps {
   sections: Array<{
     title: string;
     content: string;
-    type: 'opening' | 'argument' | 'rebuttal' | 'conclusion';
+    type: 'opening' | 'roadmap' | 'argument' | 'rebuttal' | 'conclusion';
   }>;
   onModeToggle: () => void;
   onNextSection: () => void;
   onDrop: (sectionIndex: number, itemId: string) => void;
+  showTimer?: boolean;
 }
 
 const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
@@ -24,7 +25,8 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
   sections,
   onModeToggle,
   onNextSection,
-  onDrop
+  onDrop,
+  showTimer = false
 }) => {
   const handleDrop = (e: React.DragEvent, sectionIndex: number) => {
     e.preventDefault();
@@ -38,7 +40,17 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
 
   return (
     <div className="relative">
-      <div className="flex justify-end mb-4 gap-2">
+      <div className="flex justify-between mb-4 gap-2">
+        <div>
+          {showTimer && isEditMode && (
+            <Timer 
+              initialTime={7 * 60} // 7 minutes
+              timerLabel="Speech Timer"
+              onComplete={() => {}}
+              autoStart={false}
+            />
+          )}
+        </div>
         <Button 
           variant="outline" 
           onClick={onModeToggle}
@@ -68,23 +80,29 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
           ))}
         </div>
       ) : (
-        <div className="relative min-h-[60vh] flex flex-col items-center justify-center">
-          <Timer 
-            initialTime={7 * 60}
-            timerLabel="Speech Time"
-            onComplete={() => {}}
-            className="absolute top-4 right-4"
-          />
-          <Card className="w-full max-w-3xl">
-            <CardHeader>
-              <CardTitle className="text-2xl">
-                {sections[currentSection]?.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-xl">
-              {sections[currentSection]?.content}
-            </CardContent>
-          </Card>
+        <div className="relative min-h-[60vh] flex flex-col">
+          {showTimer && (
+            <div className="sticky top-4 right-4 flex justify-end mb-4">
+              <Timer 
+                initialTime={7 * 60}
+                timerLabel="Speech Time"
+                onComplete={() => {}}
+                autoStart={false}
+              />
+            </div>
+          )}
+          
+          <div className="overflow-y-auto max-w-3xl mx-auto w-full">
+            {sections.map((section, idx) => (
+              section.content ? (
+                <div key={idx} className="mb-8">
+                  <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
+                  <div className="text-xl whitespace-pre-wrap">{section.content}</div>
+                </div>
+              ) : null
+            ))}
+          </div>
+          
           {currentSection < sections.length - 1 && (
             <Button 
               onClick={onNextSection}

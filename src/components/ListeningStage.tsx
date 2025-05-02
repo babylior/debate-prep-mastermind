@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,8 @@ import { roleContent, DebateRole, debateRoles } from "@/utils/debateData";
 import TeamNotesGrid from './TeamNotesGrid';
 import { useToast } from "@/components/ui/use-toast";
 import { StatusBar } from "@/components/ui/status-bar";
+import { Lightbulb } from "lucide-react";
+import TipsPanel from './TipsPanel';
 
 interface ListeningStageProps {
   role: string;
@@ -27,6 +30,7 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
   });
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [isTipsPanelOpen, setIsTipsPanelOpen] = useState<boolean>(false);
   
   useEffect(() => {
     const savedNotes = getNotes();
@@ -80,10 +84,22 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
 
   return (
     <div className="max-w-6xl mx-auto p-4">
-      <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
-        <h1 className="text-2xl font-bold">{roleData.listening.title}</h1>
-        <p className="text-gray-600 mt-1">{motion}</p>
-        <p className="mt-3">{roleData.listening.description}</p>
+      <div className="bg-white rounded-lg shadow-sm border p-4 mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">{roleData.listening.title}</h1>
+          <p className="text-gray-600 mt-1">{motion}</p>
+        </div>
+        
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsTipsPanelOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Lightbulb className="h-4 w-4" />
+            <span className="hidden sm:inline">Tips & Resources</span>
+          </Button>
+        </div>
       </div>
       
       <div className="mb-6">
@@ -98,6 +114,17 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
           Continue to Speech Stage
         </Button>
       </div>
+
+      {/* Tips Panel */}
+      <TipsPanel 
+        role={role as DebateRole} 
+        content={{
+          instructions: roleData.listening.instructions || [],
+          tips: roleData.listening.tips || []
+        }}
+        isOpen={isTipsPanelOpen}
+        onClose={() => setIsTipsPanelOpen(false)}
+      />
 
       <StatusBar status={saveStatus} />
     </div>
