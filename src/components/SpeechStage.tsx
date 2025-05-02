@@ -71,10 +71,11 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         }
       }
       
-      // Fixed type error: Ensure all ids are strings
+      // Fix type error: Ensure all ids are strings
       if (savedNotes.prepArguments) {
         const prepArgs = savedNotes.prepArguments.map(arg => ({
-          id: String(arg.id), // Convert to string explicitly
+          // Convert id to string explicitly to fix the type error
+          id: String(arg.id), 
           title: arg.claim,
           content: `${arg.whyTrue}\n${arg.mechanism}\n${arg.impact}`,
           type: 'argument' as const
@@ -95,10 +96,10 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         setContent(prev => ({ ...prev, rebuttals }));
       }
       
-      // Load framing content - Fix type error by ensuring id is a string
+      // Load framing content - Ensure id is a string
       if (savedNotes.prep?.framing) {
         const framing = [{
-          id: 'framing-1', // Ensure this is a string
+          id: 'framing-1', // This is already a string
           title: 'Framing',
           content: savedNotes.prep.framing,
           type: 'framing' as const
@@ -107,7 +108,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
       } else if (savedNotes.prep?.problem) {
         // Fallback to problem definition if framing isn't available
         const framing = [{
-          id: 'framing-1', // Ensure this is a string
+          id: 'framing-1', // This is already a string
           title: 'Key Context',
           content: savedNotes.prep.problem,
           type: 'framing' as const
