@@ -36,9 +36,9 @@ const SpeechLayout: React.FC<SpeechLayoutProps> = ({
 }) => {
   // Transform sections to the format expected by SpeechStructurePanel
   const formattedSections: PanelContent[] = sections.map(section => {
-    // Ensure section.content exists and is an array before calling map
-    const contentText = Array.isArray(section.content) 
-      ? section.content.map(item => item.content).join('\n')
+    // Check if section.content exists and is an array before calling map
+    const contentText = Array.isArray(section.content) && section.content.length > 0
+      ? section.content.map(item => item.content || '').join('\n')
       : '';
     
     // Determine section type based on content or name
@@ -63,20 +63,20 @@ const SpeechLayout: React.FC<SpeechLayoutProps> = ({
   const transformedContent = {
     argumentsList: content.argumentsList.map(item => ({
       id: item.id,
-      title: item.content.split('\n')[0] || 'Argument',
-      content: item.content,
+      title: (item.content || '').split('\n')[0] || 'Argument',
+      content: item.content || '',
       type: item.type
     })),
     rebuttals: content.rebuttals.map(item => ({
       id: item.id,
-      title: item.content.split('\n')[0] || 'Rebuttal',
-      content: item.content,
+      title: (item.content || '').split('\n')[0] || 'Rebuttal',
+      content: item.content || '',
       type: item.type
     })),
     framing: content.framing.map(item => ({
       id: item.id,
-      title: item.content.split('\n')[0] || 'Framing',
-      content: item.content,
+      title: (item.content || '').split('\n')[0] || 'Framing',
+      content: item.content || '',
       type: item.type
     }))
   };

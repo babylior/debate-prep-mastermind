@@ -51,7 +51,10 @@ export const useSpeechContent = (role: string) => {
         if (savedNotes.speech.content) {
           // Make sure we're getting the correct type
           const savedContent = savedNotes.speech.content;
-          setContent(savedContent as SpeechContent);
+          // Ensure savedContent is properly typed
+          if (typeof savedContent === 'object' && savedContent !== null) {
+            setContent(savedContent as SpeechContent);
+          }
         }
       } else {
         // Initialize with default sections
@@ -85,8 +88,14 @@ export const useSpeechContent = (role: string) => {
           notes.speech = {};
         }
         
-        notes.speech.sections = sections;
-        notes.speech.content = content;
+        // Ensure notes.speech is properly typed to accept our data
+        if (typeof notes.speech === 'object') {
+          notes.speech = {
+            ...notes.speech,
+            sections,
+            content
+          };
+        }
         
         saveNotes(notes);
         setSaveStatus('saved');
