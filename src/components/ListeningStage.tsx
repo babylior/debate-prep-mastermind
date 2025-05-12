@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -83,7 +82,7 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-4" dir="rtl">
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{roleData.listening.title}</h1>
@@ -115,12 +114,13 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
         </Button>
       </div>
 
-      {/* Tips Panel */}
+      {/* Side Panel for Tips */}
       <TipsPanel 
         role={role as DebateRole} 
         content={{
-          instructions: roleData.listening.instructions || [],
-          tips: roleData.listening.tips || []
+          instructions: roleData.listening.instructions,
+          questions: roleData.listening.questions || [], // Ensure questions is provided
+          tips: roleData.listening.tips
         }}
         isOpen={isTipsPanelOpen}
         onClose={() => setIsTipsPanelOpen(false)}

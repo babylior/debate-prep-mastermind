@@ -1,18 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
 import { useToast } from "@/components/ui/use-toast";
 import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
-import DraggableArgumentCard from './DraggableArgumentCard';
-import { Lightbulb, Plus } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import TipsPanel from './TipsPanel';
 import PrepTabs from './PrepTabs';
 import { StatusBar } from '@/components/ui/status-bar';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import IdeaDumpTab from './prep/IdeaDumpTab';
+import ArgumentBuilderTab from './prep/ArgumentBuilderTab';
 
 interface PrepStageProps {
   role: string;
@@ -47,7 +46,6 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
   
   const [prepArguments, setPrepArguments] = useState<Argument[]>([]);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
-  const [autoStartTimer, setAutoStartTimer] = useState(false);
 
   // Initialize notes from localStorage
   useEffect(() => {
@@ -238,133 +236,31 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
     switch (activeTab) {
       case 'idea-dump':
         return (
-          <Card className="bg-white shadow-md">
-            <CardHeader>
-              <CardTitle>רעיונות ראשוניים</CardTitle>
-              <CardDescription>רשום כאן את כל הרעיונות הראשוניים שלך, לפני ארגון הטיעונים</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="כתוב כאן את כל הרעיונות שלך. אל תדאג לארגון בשלב זה, פשוט כתוב את כל מה שעולה לך בראש..."
-                className="min-h-[400px] rtl"
-                dir="rtl"
-                value={notes.ideaDump}
-                onChange={(e) => handleNoteChange('ideaDump', e.target.value)}
-              />
-            </CardContent>
-          </Card>
+          <IdeaDumpTab 
+            notes={notes.ideaDump}
+            onChange={(value) => handleNoteChange('ideaDump', value)}
+          />
         );
       
       case 'argument-builder':
         return (
-          <div className="space-y-6">
-            {/* Framing Section */}
-            <Accordion type="single" collapsible className="w-full bg-white shadow-md rounded-lg">
-              <AccordionItem value="framing">
-                <AccordionTrigger className="px-4 py-2 font-bold text-lg">פריימינג והקשר</AccordionTrigger>
-                <AccordionContent className="px-4 pb-4">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>בעיה/מצב נוכחי</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <Textarea
-                            placeholder="הגדר את הבעיה או המצב הנוכחי..."
-                            className="min-h-[150px] rtl"
-                            dir="rtl"
-                            value={notes.problem}
-                            onChange={(e) => handleNoteChange('problem', e.target.value)}
-                          />
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>מנגנון/פתרון</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <Textarea
-                            placeholder="תאר את המנגנון או הגישה שלך..."
-                            className="min-h-[150px] rtl"
-                            dir="rtl"
-                            value={notes.mechanism}
-                            onChange={(e) => handleNoteChange('mechanism', e.target.value)}
-                          />
-                        </CardContent>
-                      </Card>
-                    </div>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>פריימינג כללי</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <Textarea
-                          placeholder="הגדר את מסגרת הדיון וההקשרים המרכזיים..."
-                          className="min-h-[150px] rtl"
-                          dir="rtl"
-                          value={notes.framing}
-                          onChange={(e) => handleNoteChange('framing', e.target.value)}
-                        />
-                      </CardContent>
-                    </Card>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-            
-            {/* Arguments Section */}
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">טיעונים</h2>
-                <Button onClick={addArgument} className="flex items-center gap-2 bg-primary hover:bg-primary/90">
-                  <Plus className="h-4 w-4 mr-2" />
-                  הוסף טיעון
-                </Button>
-              </div>
-              
-              <div className="space-y-6">
-                {prepArguments.map((arg, index) => (
-                  <div 
-                    key={arg.id} 
-                    onDragOver={(e) => handleDragOver(e, index)}
-                  >
-                    <DraggableArgumentCard
-                      id={arg.id}
-                      claim={arg.claim}
-                      whyTrue={arg.whyTrue}
-                      mechanism={arg.mechanism}
-                      impact={arg.impact}
-                      weighing={arg.weighing}
-                      index={index}
-                      onDelete={deleteArgument}
-                      onDuplicate={duplicateArgument}
-                      onChange={updateArgument}
-                      onDragStart={handleDragStart}
-                      onDragEnd={handleDragEnd}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Rebuttals Section */}
-            <Card className="bg-white shadow-md">
-              <CardHeader>
-                <CardTitle>הכנת תשובות לטיעוני הצד השני</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="הכן תשובות אפשריות לטיעונים של הצד השני..."
-                  className="min-h-[200px] rtl"
-                  dir="rtl"
-                  value={notes.notes}
-                  onChange={(e) => handleNoteChange('notes', e.target.value)}
-                />
-              </CardContent>
-            </Card>
-          </div>
+          <ArgumentBuilderTab 
+            notes={{
+              problem: notes.problem,
+              mechanism: notes.mechanism,
+              framing: notes.framing,
+              notes: notes.notes
+            }}
+            arguments={prepArguments}
+            onNotesChange={handleNoteChange}
+            onAddArgument={addArgument}
+            onDeleteArgument={deleteArgument}
+            onDuplicateArgument={duplicateArgument}
+            onUpdateArgument={updateArgument}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+          />
         );
       
       default:
@@ -400,7 +296,7 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
               initialTime={15 * 60} // 15 minutes in seconds
               timerLabel="זמן הכנה"
               onComplete={handleTimerComplete}
-              autoStart={autoStartTimer}
+              autoStart={false}
             />
           </div>
         </div>

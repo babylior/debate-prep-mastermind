@@ -1,277 +1,74 @@
-
-import React, { useState } from 'react';
+import React from 'react';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { DebateRole } from "@/utils/debateData";
+import { DebateRole } from '@/utils/debateData';
+import { Separator } from "@/components/ui/separator"
+
+// Update this interface to ensure questions is always provided
+interface TipsPanelContent {
+  instructions: string[];
+  questions: string[]; // Make sure this is required
+  tips: string[];
+}
 
 interface TipsPanelProps {
   role: DebateRole;
-  content: {
-    instructions: string[];
-    questions: string[];
-    tips: string[];
-  };
+  content: TipsPanelContent;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const TipsPanel: React.FC<TipsPanelProps> = ({ role, content, isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<string>("instructions");
-
-  // Define categories for notes tab
-  const notesByCategory = {
-    politics: {
-      title: "פוליטיקה",
-      items: [
-        "בית זה",
-        "מהי הבעיה שהמושיין מנסה לפתור?",
-        "מה הערך המרכזי בדיון? (חירות, שוויון, יציבות, צדק, דמוקרטיה)"
-      ]
-    },
-    framing: {
-      title: "פריימינג",
-      items: [
-        "מה השאלה המרכזית שתכריע את הדיבייט (Core Clash)?",
-        "אילו קלאשים צפויים לעלות?"
-      ]
-    },
-    arguments: {
-      title: "טיעונים",
-      items: [
-        "מהן ההשלכות הרחבות ביותר של המדיניות?",
-        "מי מרוויח ומי מפסיד מהמדיניות?",
-        "האם הפגיעה בזכויות מוצדקת?",
-        "האם המדיניות יוצרת או מצמצמת פערים חברתיים?",
-        "מה יקרה אם לא נפעל?"
-      ]
-    },
-    economy: {
-      title: "כלכלה",
-      items: [
-        "איך זה ישפיע על עושר, צמיחה, או נטל כלכלי?"
-      ]
-    },
-    society: {
-      title: "חברה",
-      items: [
-        "איך זה ישפיע על לכידות חברתית או פערים?"
-      ]
-    },
-    rights: {
-      title: "זכויות",
-      items: [
-        "האם המדיניות פוגעת בזכויות יסוד, ואם כן, האם זה מוצדק?"
-      ]
-    },
-    international: {
-      title: "בינלאומי",
-      items: [
-        "האם זה מחזק את מעמד המדינה בזירה הגלובלית?"
-      ]
-    },
-    alternatives: {
-      title: "אלטרנטיבות",
-      items: [
-        "חשיבה על אלטרנטיבות (1-2 דקות)",
-        "מטרות השלב: לחשוב על פתרונות אחרים שאפשר להציע במקרה של צד Opposition.",
-        "אלטרנטיבה למדיניות המוצעת:",
-        "למה האלטרנטיבה עדיפה על המדיניות?"
-      ]
-    },
-    problem: {
-      title: "על הבעיה",
-      items: [
-        "מהי הבעיה המרכזית שהמושיין מתייחס אליה?",
-        "למה היא קיימת? (מהם הכשלים בסטטוס-קוו?)",
-        "עד כמה היא חמורה? (מהו היקף הנזק שלה?)",
-        "האם זו בעיה דחופה שדורשת פתרון מיידי, או משהו שאפשר לפתור לאורך זמן?",
-        "למה המדינה היא זו שצריכה לפתור את הבעיה?",
-        "האם הבעיה הזו נובעת מכשל של המדינה?",
-        "האם יש לגורם אחר (פרטי, אזרחי, בינלאומי) יכולת לטפל בה?"
-      ]
-    },
-    solution: {
-      title: "על הפתרון",
-      items: [
-        "איך המדיניות פותרת את הבעיה?",
-        "מהו המנגנון שלה? (מה היא משנה בסטטוס-קוו?)",
-        "האם היא פותרת את הבעיה באופן מלא או חלקי?",
-        "האם המדיניות הזו יוצרת בעיות חדשות במקום הפתרון?",
-        "האם יש למדינה את המשאבים ליישם את המדיניות הזו?",
-        "האם נדרשים תקציבים גדולים, שינויי חקיקה או מערכות ניהול חדשות?",
-        "האם המדינה מסוגלת להפעיל פיקוח יעיל על המדיניות?"
-      ]
-    },
-    impact: {
-      title: "על ההשפעה",
-      items: [
-        "מי מרוויח ומי מפסיד מהמדיניות הזו?",
-        "האם המדיניות מיטיבה בעיקר עם קבוצות חזקות או חלשות?",
-        "האם יש קבוצות מסוימות שנפגעות בצורה לא פרופורציונלית?",
-        "האם היא פותרת בעיה של קבוצה קטנה במחיר שמשולם על ידי הרוב?",
-        "מה ההשפעה על הקהילה והחברה כולה?",
-        "האם המדיניות מעודדת אחדות חברתית או יוצרת קיטוב?",
-        "האם היא מצמצמת פערים או מעמיקה אותם?",
-        "האם היא משפרת את איכות החיים בטווח הקצר או הארוך?"
-      ]
-    },
-    morality: {
-      title: "זכויות והצדקה מוסרית",
-      items: [
-        "האם המדיניות פוגעת בזכויות פרט כלשהן?",
-        "האם יש פגיעה בחירות, פרטיות, חופש ביטוי או שוויון?",
-        "אם כן, האם הפגיעה מוצדקת?",
-        "האם יש חובה מוסרית לפעול?",
-        "האם יש כאן אי-צדק שמחייב תיקון?",
-        "האם יש קבוצות מוחלשות שהמדיניות מחויבת לעזור להן, גם אם זה בא על חשבון אחרים?"
-      ]
-    },
-    implementation: {
-      title: "על יישום",
-      items: [
-        "האם המדיניות ישימה בפועל?",
-        "מה הסיכוי שהיא תצליח לפתור את הבעיה שהיא מכוונת אליה?",
-        "האם המדיניות דורשת שינויים גדולים מדי במערכת, או שינויים קטנים יחסית?",
-        "האם יש מדינות אחרות שבהן מדיניות דומה הצליחה או נכשלה?",
-        "האם המדיניות יוצרת תקדים מסוכן?",
-        "האם המדיניות פותחת פתח לניצול פוליטי או לריכוז כוח?",
-        "האם היא עלולה להרחיב סמכויות שלטוניות מעבר למה שנדרש?"
-      ]
-    },
-    alternatives_detailed: {
-      title: "חלופות למדיניות",
-      items: [
-        "האם יש דרכים אחרות לפתור את הבעיה?",
-        "האם מדיניות אחרת יכולה להשיג את אותה מטרה בפחות עלויות/פגיעות?",
-        "האם סטטוס-קוו טוב יותר מהמדיניות המוצעת?",
-        "מה ההשפעה של אלטרנטיבות?",
-        "האם אלטרנטיבה מסוימת משמרת את היתרונות של המדיניות בלי תופעות הלוואי שלה?",
-        "האם האלטרנטיבה דורשת פחות משאבים או פחות התערבות של המדינה?"
-      ]
-    },
-    timing: {
-      title: "זמן והשפעות עתידיות",
-      items: [
-        "מה היתרון של פעולה מיידית?",
-        "האם דחייה של המדיניות תחמיר את הבעיה?",
-        "האם פעולה עכשיו מונעת השלכות חמורות בטווח הארוך?",
-        "מה הסיכונים בטווח הארוך?",
-        "האם המדיניות יוצרת בעיות חדשות שאי אפשר לחזות?",
-        "האם היא יכולה לגרום לשחיקה של ערכים חברתיים/דמוקרטיים?"
-      ]
-    },
-    foreignRelations: {
-      title: "יחסי חוץ והשפעה גלובלית",
-      items: [
-        "איך המדיניות משפיעה על מעמד המדינה בזירה הבינלאומית?",
-        "האם היא מציירת את המדינה כמודל מוסרי?",
-        "האם היא משפרת שיתופי פעולה עם מדינות אחרות?",
-        "איך מדינות אחרות יגיבו למדיניות הזו?",
-        "האם היא מעודדת מדינות אחרות לאמץ צעדים דומים?",
-        "האם היא יוצרת מתחים דיפלומטיים?"
-      ]
-    },
-    govArgument: {
-      title: "טיעון - ממשלה",
-      items: [
-        "1. בעיה (Problem): למה יש צורך במדיניות שלך. למה הבעיה קיימת, למה הסטטוס-קוו לא עובד, ולמה אי-פעולה היא לא אופציה.",
-        "מה הבעיה המרכזית? האם זו בעיה חברתית, כלכלית, מוסרית או פוליטית? האם היא מקומית או גלובלית?",
-        "למה הבעיה קיימת? איזה כשל במדיניות הקיימת גרם לבעיה? האם יש כשלים מבניים, מוסריים או טכניים שמחייבים התערבות?",
-        "למה זה דחוף? למה אי-טיפול בבעיה עכשיו יחמיר את המצב? מהן ההשלכות של שמירה על הסטטוס-קוו?",
-        "נטלים שצריך להוכיח בשלב הזה: שהבעיה היא אמיתית ומשמעותית. שהסטטוס-קוו לא פותר את הבעיה. שהמדיניות שלך ממוקדת בבעיה רלוונטית.",
-        "2. מנגנון (Mechanism): המקום שבו את מסבירה איך המדיניות המוצעת שלך פועלת בפועל כדי לפתור את הבעיה.",
-        "איך המדיניות עובדת? מה הם הכלים שהמדיניות מפעילה? האם הכלים האלו ריאליים וישימים?",
-        "למה זה עובד? איך המדיניות משנה את המצב בשטח? איזה מנגנון חברתי/כלכלי/פוליטי מופעל על ידי המדיניות?",
-        "איך המדיניות מונעת כשלי יישום? איך המדינה מתמודדת עם אתגרים ביישום, כמו שחיתות, חוסר תקציב או התנגדות ציבורית?",
-        "נטלים שצריך להוכיח בשלב הזה: שהמדיניות שלך היא ישימה וניתנת ליישום. שהמדיניות שלך תוביל לשינוי הרצוי ותפתור את הבעיה. שהמדיניות שלך טובה יותר מהסטטוס-קוו.",
-        "3. אימפקטים: למה אכפת לנו. מה קורה אחרי שהמדיניות מיושמת ומהן התוצאות הרחבות שלה.",
-        "מי מושפע מהמדיניות? איזה קבוצות ירוויחו ואיזה ייפגעו? האם המדיניות מצמצמת פערים חברתיים/כלכליים/פוליטיים?",
-        "מהו האימפקט קצר הטווח? אילו שינויים מיידיים יקרו כתוצאה מהמדיניות? האם יש תופעות לוואי, ומה המחיר שלהן?",
-        "מהו האימפקט ארוך הטווח? איך המדיניות משפרת את החברה, הכלכלה, או המערכת הפוליטית לאורך זמן? האם היא יוצרת תקדימים חיוביים?",
-        "למה האימפקט הזה חשוב יותר מהטיעונים של הצד השני? למה הערך שהמדיניות מקדמת חשוב יותר מערכים מנוגדים?"
-      ]
-    },
-    oppArgument: {
-      title: "טיעון - אופוזיציה פוליטיקה",
-      items: [
-        "הבעיה שהממשלה מציגה היא לא חמורה כפי שהיא מתארת, או שזו לא בעיה בכלל.",
-        "האם הבעיה אמיתית, או שהממשלה מנפחת אותה?",
-        "האם הבעיה באמת מצריכה פתרון עכשיו? האם מדובר במשבר אמיתי, או בתופעה שאפשר לחכות ולראות איך היא מתפתחת?",
-        "האם הבעיה קיימת רק בקבוצה קטנה או שולית באוכלוסייה?",
-        "נטלים (Burdens): להראות שהבעיה אינה חמורה מספיק כדי להצדיק מדיניות. להראות שהבעיה ממוקדת מדי בקבוצה מסוימת ולא משקפת את טובת הכלל.",
-        "2. ערעור המנגנון של המדיניות",
-        "האם המדיניות ישימה בכלל? האם יש לממשלה את המשאבים הפיננסיים, הטכנולוגיים או הביורוקרטיים ליישם את המדיניות הזו?",
-        "האם יש התנגדות פוליטית או ציבורית משמעותית שתמנע את היישום? לדוגמה: האם ציבור גדול ייצא להפגין או יעקוף את החוק",
-        "האם יש למנגנון תופעות לוואי חמורות יותר מהתועלת שהוא מביא?",
-        "3. ערעור ההשפעה של המדיניות",
-        "האם ההשפעה החיובית שמציגה הממשלה מוגבלת? האם המדיניות פוגעת בצורה חמורה בקבוצות מסוימות?",
-        "האם ההשפעות החיוביות יתקיימו רק בטווח הארוך, בזמן שהנזק בטווח הקצר כבד מדי?",
-        "נטלים: להראות שהאימפקט של המדיניות קטן, מוגבל או שולי. להראות שהאימפקט החיובי לא מצדיק את המחיר השלילי."
-      ]
-    }
-  };
-
   return (
-    <Sheet open={isOpen} onOpenChange={() => onClose()}>
-      <SheetContent className="w-full sm:max-w-md md:max-w-lg overflow-y-auto" side="right">
-        <SheetHeader className="mb-4">
-          <SheetTitle>טיפים ומשאבים</SheetTitle>
-        </SheetHeader>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="instructions">הוראות</TabsTrigger>
-            <TabsTrigger value="questions">שאלות</TabsTrigger>
-            <TabsTrigger value="categories">נטלים לפי קטגוריה</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="instructions" className="mt-4 space-y-4">
-            {content.instructions.map((instruction, index) => (
-              <div key={index} className="bg-white p-3 rounded-md shadow-sm border">
-                <p>{instruction}</p>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="questions" className="mt-4">
-            <div className="bg-white p-3 rounded-md shadow-sm border">
-              <ol className="space-y-2 list-decimal list-inside">
-                {content.questions.map((question, index) => (
-                  <li key={index}>{question}</li>
-                ))}
-              </ol>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="categories" className="mt-4" dir="rtl">
-            <Accordion type="single" collapsible className="w-full">
-              {Object.entries(notesByCategory).map(([key, category]) => (
-                <AccordionItem key={key} value={key}>
-                  <AccordionTrigger className="px-3 hover:bg-gray-50">
-                    {category.title}
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-2">
-                    <ul className="space-y-2 list-disc list-inside">
-                      {category.items.map((item, i) => (
-                        <li key={i} className="text-right">{item}</li>
-                      ))}
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
+    <Drawer open={isOpen} onOpenChange={onClose}>
+      <DrawerContent className="bg-white text-black">
+        <DrawerHeader>
+          <DrawerTitle>טיפים ומקורות השראה</DrawerTitle>
+          <DrawerDescription>עצות ורעיונות שיעזרו לך להתכונן</DrawerDescription>
+        </DrawerHeader>
+        <div className="p-4 space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">הוראות הכנה</h3>
+            <ul className="list-disc list-inside">
+              {content.instructions.map((instruction, index) => (
+                <li key={index}>{instruction}</li>
               ))}
-            </Accordion>
-          </TabsContent>
-        </Tabs>
-
-        <div className="mt-8 text-center">
-          <Button variant="outline" onClick={onClose}>
-            סגור
-          </Button>
+            </ul>
+          </div>
+          <Separator />
+          <div>
+            <h3 className="text-lg font-semibold">שאלות מנחות</h3>
+            <ul className="list-decimal list-inside">
+              {content.questions.map((question, index) => (
+                <li key={index}>{question}</li>
+              ))}
+            </ul>
+          </div>
+          <Separator />
+          <div>
+            <h3 className="text-lg font-semibold">טיפים</h3>
+            <ul className="list-disc list-inside">
+              {content.tips.map((tip, index) => (
+                <li key={index}>{tip}</li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </SheetContent>
-    </Sheet>
+        <DrawerFooter>
+          <DrawerClose>
+            <Button variant="outline">סגור</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 };
 

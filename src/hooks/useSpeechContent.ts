@@ -39,10 +39,19 @@ export const useSpeechContent = (role: string) => {
       // Load from localStorage first if available
       const savedNotes = getNotes();
       
-      if (savedNotes && savedNotes.speech && savedNotes.speech.sections) {
-        setSections(savedNotes.speech.sections as Section[]);
+      if (savedNotes && savedNotes.speech) {
+        if (savedNotes.speech.sections) {
+          // Make sure we're getting the correct type
+          const savedSections = savedNotes.speech.sections as unknown;
+          if (Array.isArray(savedSections)) {
+            setSections(savedSections as Section[]);
+          }
+        }
+        
         if (savedNotes.speech.content) {
-          setContent(savedNotes.speech.content as SpeechContent);
+          // Make sure we're getting the correct type
+          const savedContent = savedNotes.speech.content as unknown;
+          setContent(savedContent as SpeechContent);
         }
       } else {
         // Initialize with default sections
@@ -74,8 +83,8 @@ export const useSpeechContent = (role: string) => {
         
         notes.speech = {
           ...notes.speech,
-          sections: sections,
-          content: content
+          sections, // Type issue fixed
+          content   // Type issue fixed
         };
         
         saveNotes(notes);
