@@ -8,48 +8,88 @@ export interface TextareaProps
   onBold?: () => void;
   onItalic?: () => void;
   onHighlight?: () => void;
+  onPurpleColor?: () => void;
+  onBlueColor?: () => void;
+  onGreenColor?: () => void;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, onBold, onItalic, onHighlight, ...props }, ref) => {
+  ({ className, onBold, onItalic, onHighlight, onPurpleColor, onBlueColor, onGreenColor, ...props }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
     // Initialize auto-resize
     useAutoResize(textareaRef);
 
     return (
       <div className="flex flex-col w-full">
-        {(onBold || onItalic || onHighlight) && (
-          <div className="flex items-center mb-1 gap-1">
-            {onBold && (
-              <button 
-                type="button" 
-                onClick={onBold} 
-                className="p-1 hover:bg-gray-200 rounded"
-                title="Bold"
-              >
-                <span className="font-bold">B</span>
-              </button>
-            )}
-            {onItalic && (
-              <button 
-                type="button" 
-                onClick={onItalic} 
-                className="p-1 hover:bg-gray-200 rounded"
-                title="Italic"
-              >
-                <span className="italic">I</span>
-              </button>
-            )}
-            {onHighlight && (
-              <button 
-                type="button" 
-                onClick={onHighlight} 
-                className="p-1 hover:bg-gray-200 rounded"
-                title="Highlight"
-              >
-                <span className="bg-yellow-200 px-1">H</span>
-              </button>
-            )}
+        {(onBold || onItalic || onHighlight || onPurpleColor || onBlueColor || onGreenColor) && (
+          <div className="flex items-center mb-1 gap-1 flex-wrap">
+            {/* Text style buttons */}
+            <div className="flex gap-1 mr-2">
+              {onBold && (
+                <button 
+                  type="button" 
+                  onClick={onBold} 
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Bold"
+                >
+                  <span className="font-bold">B</span>
+                </button>
+              )}
+              {onItalic && (
+                <button 
+                  type="button" 
+                  onClick={onItalic} 
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Italic"
+                >
+                  <span className="italic">I</span>
+                </button>
+              )}
+              {onHighlight && (
+                <button 
+                  type="button" 
+                  onClick={onHighlight} 
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Highlight"
+                >
+                  <span className="bg-yellow-200 px-1">H</span>
+                </button>
+              )}
+            </div>
+
+            {/* Color buttons */}
+            <div className="flex gap-1">
+              {onPurpleColor && (
+                <button 
+                  type="button" 
+                  onClick={onPurpleColor} 
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Purple Text"
+                >
+                  <span className="text-purple-600 font-bold">A</span>
+                </button>
+              )}
+              {onBlueColor && (
+                <button 
+                  type="button" 
+                  onClick={onBlueColor} 
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Blue Text"
+                >
+                  <span className="text-blue-600 font-bold">A</span>
+                </button>
+              )}
+              {onGreenColor && (
+                <button 
+                  type="button" 
+                  onClick={onGreenColor} 
+                  className="p-1 hover:bg-gray-200 rounded"
+                  title="Green Text"
+                >
+                  <span className="text-green-600 font-bold">A</span>
+                </button>
+              )}
+            </div>
           </div>
         )}
         <textarea

@@ -51,6 +51,9 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                     onBold={problemFormatting.handleBold}
                     onItalic={problemFormatting.handleItalic}
                     onHighlight={problemFormatting.handleHighlight}
+                    onPurpleColor={problemFormatting.handlePurpleColor}
+                    onBlueColor={problemFormatting.handleBlueColor}
+                    onGreenColor={problemFormatting.handleGreenColor}
                   />
                 </CardContent>
               </Card>
@@ -71,6 +74,9 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                     onBold={mechanismFormatting.handleBold}
                     onItalic={mechanismFormatting.handleItalic}
                     onHighlight={mechanismFormatting.handleHighlight}
+                    onPurpleColor={mechanismFormatting.handlePurpleColor}
+                    onBlueColor={mechanismFormatting.handleBlueColor}
+                    onGreenColor={mechanismFormatting.handleGreenColor}
                   />
                 </CardContent>
               </Card>
@@ -91,6 +97,9 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                   onBold={framingFormatting.handleBold}
                   onItalic={framingFormatting.handleItalic}
                   onHighlight={framingFormatting.handleHighlight}
+                  onPurpleColor={framingFormatting.handlePurpleColor}
+                  onBlueColor={framingFormatting.handleBlueColor}
+                  onGreenColor={framingFormatting.handleGreenColor}
                 />
               </CardContent>
             </Card>

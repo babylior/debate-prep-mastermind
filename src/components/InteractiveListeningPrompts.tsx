@@ -24,7 +24,15 @@ const InteractiveListeningPrompts: React.FC<InteractiveListeningPromptsProps> = 
   return (
     <div className="space-y-4">
       {prompts.map((prompt) => {
-        const { handleSelection, handleBold, handleItalic, handleHighlight } = useTextFormat({
+        const { 
+          handleSelection, 
+          handleBold, 
+          handleItalic, 
+          handleHighlight,
+          handlePurpleColor,
+          handleBlueColor,
+          handleGreenColor
+        } = useTextFormat({
           value: prompt.answer,
           onChange: (value) => onChange(prompt.id, value)
         });
@@ -43,6 +51,9 @@ const InteractiveListeningPrompts: React.FC<InteractiveListeningPromptsProps> = 
                 onBold={handleBold}
                 onItalic={handleItalic}
                 onHighlight={handleHighlight}
+                onPurpleColor={handlePurpleColor}
+                onBlueColor={handleBlueColor}
+                onGreenColor={handleGreenColor}
                 placeholder="Write your answer here..."
                 className="min-h-[100px]"
               />

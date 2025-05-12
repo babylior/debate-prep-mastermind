@@ -10,7 +10,15 @@ interface RebuttalSectionProps {
 }
 
 const RebuttalSection: React.FC<RebuttalSectionProps> = ({ notes, onChange }) => {
-  const { handleSelection, handleBold, handleItalic, handleHighlight } = useTextFormat({
+  const { 
+    handleSelection, 
+    handleBold, 
+    handleItalic, 
+    handleHighlight,
+    handlePurpleColor,
+    handleBlueColor,
+    handleGreenColor
+  } = useTextFormat({
     value: notes,
     onChange
   });
@@ -32,6 +40,9 @@ const RebuttalSection: React.FC<RebuttalSectionProps> = ({ notes, onChange }) =>
           onBold={handleBold}
           onItalic={handleItalic}
           onHighlight={handleHighlight}
+          onPurpleColor={handlePurpleColor}
+          onBlueColor={handleBlueColor}
+          onGreenColor={handleGreenColor}
         />
       </CardContent>
     </Card>
