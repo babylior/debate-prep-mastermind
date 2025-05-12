@@ -3,6 +3,7 @@ import React from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useTextFormat } from '@/hooks/useTextFormat';
 
 interface FramingSectionProps {
   problem: string;
@@ -12,6 +13,21 @@ interface FramingSectionProps {
 }
 
 const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, framing, onChange }) => {
+  const problemFormatting = useTextFormat({
+    value: problem,
+    onChange: (value) => onChange('problem', value)
+  });
+
+  const mechanismFormatting = useTextFormat({
+    value: mechanism,
+    onChange: (value) => onChange('mechanism', value)
+  });
+
+  const framingFormatting = useTextFormat({
+    value: framing,
+    onChange: (value) => onChange('framing', value)
+  });
+
   return (
     <Accordion type="single" collapsible className="w-full bg-white shadow-md rounded-lg">
       <AccordionItem value="framing">
@@ -30,6 +46,11 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                     dir="rtl"
                     value={problem}
                     onChange={(e) => onChange('problem', e.target.value)}
+                    onKeyUp={problemFormatting.handleSelection}
+                    onMouseUp={problemFormatting.handleSelection}
+                    onBold={problemFormatting.handleBold}
+                    onItalic={problemFormatting.handleItalic}
+                    onHighlight={problemFormatting.handleHighlight}
                   />
                 </CardContent>
               </Card>
@@ -45,6 +66,11 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                     dir="rtl"
                     value={mechanism}
                     onChange={(e) => onChange('mechanism', e.target.value)}
+                    onKeyUp={mechanismFormatting.handleSelection}
+                    onMouseUp={mechanismFormatting.handleSelection}
+                    onBold={mechanismFormatting.handleBold}
+                    onItalic={mechanismFormatting.handleItalic}
+                    onHighlight={mechanismFormatting.handleHighlight}
                   />
                 </CardContent>
               </Card>
@@ -60,6 +86,11 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                   dir="rtl"
                   value={framing}
                   onChange={(e) => onChange('framing', e.target.value)}
+                  onKeyUp={framingFormatting.handleSelection}
+                  onMouseUp={framingFormatting.handleSelection}
+                  onBold={framingFormatting.handleBold}
+                  onItalic={framingFormatting.handleItalic}
+                  onHighlight={framingFormatting.handleHighlight}
                 />
               </CardContent>
             </Card>

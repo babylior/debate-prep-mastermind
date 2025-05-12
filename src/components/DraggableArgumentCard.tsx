@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Copy } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useTextFormat } from '@/hooks/useTextFormat';
 
 interface DraggableArgumentCardProps {
   id: string;
@@ -70,7 +71,6 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
   onDragEnd,
 }) => {
   const { toast } = useToast();
-
   const values = { claim, whyTrue, mechanism, impact, weighing };
 
   return (
@@ -121,21 +121,34 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
           </div>
         </CardHeader>
         <CardContent className="pt-4">
-          {SECTION_FIELDS.map(({ key, label, placeholder }) => (
-            <div className="mb-4" key={key}>
-              <label className="block text-sm font-medium mb-1" htmlFor={`${id}-${key}`}>
-                {label}
-              </label>
-              <Textarea
-                id={`${id}-${key}`}
-                value={values[key]}
-                onChange={e => onChange(id, key, e.target.value)}
-                placeholder={placeholder}
-                className="w-full min-h-[60px] bg-white border border-gray-200 rounded-md p-2 text-base placeholder:text-gray-400 mt-1 rtl"
-                dir="rtl"
-              />
-            </div>
-          ))}
+          {SECTION_FIELDS.map(({ key, label, placeholder }) => {
+            // Setup text formatting for each field
+            const { handleSelection, handleBold, handleItalic, handleHighlight } = useTextFormat({
+              value: values[key],
+              onChange: (newValue) => onChange(id, key, newValue)
+            });
+
+            return (
+              <div className="mb-4" key={key}>
+                <label className="block text-sm font-medium mb-1" htmlFor={`${id}-${key}`}>
+                  {label}
+                </label>
+                <Textarea
+                  id={`${id}-${key}`}
+                  value={values[key]}
+                  onChange={e => onChange(id, key, e.target.value)}
+                  placeholder={placeholder}
+                  className="w-full min-h-[60px] bg-white border border-gray-200 rounded-md p-2 text-base placeholder:text-gray-400 mt-1 rtl"
+                  dir="rtl"
+                  onKeyUp={handleSelection}
+                  onMouseUp={handleSelection}
+                  onBold={handleBold}
+                  onItalic={handleItalic}
+                  onHighlight={handleHighlight}
+                />
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
       {onAdd && (

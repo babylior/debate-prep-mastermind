@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { useTextFormat } from '@/hooks/useTextFormat';
 
 interface RebuttalSectionProps {
   notes: string;
@@ -9,6 +10,11 @@ interface RebuttalSectionProps {
 }
 
 const RebuttalSection: React.FC<RebuttalSectionProps> = ({ notes, onChange }) => {
+  const { handleSelection, handleBold, handleItalic, handleHighlight } = useTextFormat({
+    value: notes,
+    onChange
+  });
+
   return (
     <Card className="bg-white shadow-md">
       <CardHeader>
@@ -21,6 +27,11 @@ const RebuttalSection: React.FC<RebuttalSectionProps> = ({ notes, onChange }) =>
           dir="rtl"
           value={notes}
           onChange={(e) => onChange(e.target.value)}
+          onKeyUp={handleSelection}
+          onMouseUp={handleSelection}
+          onBold={handleBold}
+          onItalic={handleItalic}
+          onHighlight={handleHighlight}
         />
       </CardContent>
     </Card>

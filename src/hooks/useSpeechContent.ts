@@ -88,14 +88,10 @@ export const useSpeechContent = (role: string) => {
           notes.speech = {};
         }
         
-        // Ensure notes.speech is properly typed to accept our data
-        if (typeof notes.speech === 'object') {
-          notes.speech = {
-            ...notes.speech,
-            sections,
-            content
-          };
-        }
+        // Note: Fix type issues by using a type assertion
+        const speechData = notes.speech as Record<string, unknown>;
+        speechData.sections = sections;
+        speechData.content = content;
         
         saveNotes(notes);
         setSaveStatus('saved');

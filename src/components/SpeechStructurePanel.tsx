@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
 import { Eye, Edit } from "lucide-react";
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface SpeechStructurePanelProps {
   isEditMode: boolean;
@@ -73,7 +75,11 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
                 <CardTitle>{section.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                {section.content || 'Drop content here'}
+                {section.content ? (
+                  <MarkdownRenderer text={section.content} />
+                ) : (
+                  'Drop content here'
+                )}
               </CardContent>
             </Card>
           ))}
@@ -96,7 +102,9 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
               section.content ? (
                 <div key={idx} className="mb-8">
                   <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
-                  <div className="text-xl whitespace-pre-wrap">{section.content}</div>
+                  <div className="text-xl whitespace-pre-wrap">
+                    <MarkdownRenderer text={section.content} />
+                  </div>
                 </div>
               ) : null
             ))}
