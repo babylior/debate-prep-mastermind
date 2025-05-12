@@ -20,7 +20,7 @@ interface ArgumentBuilderTabProps {
     framing: string;
     notes: string;
   };
-  arguments: Argument[];
+  args: Argument[]; // Changed from 'arguments' to 'args'
   onNotesChange: (key: string, value: string) => void;
   onAddArgument: () => void;
   onDeleteArgument: (id: string) => void;
@@ -37,7 +37,7 @@ interface ArgumentBuilderTabProps {
 
 const ArgumentBuilderTab: React.FC<ArgumentBuilderTabProps> = ({
   notes,
-  arguments,
+  args, // Changed from 'arguments' to 'args'
   onNotesChange,
   onAddArgument,
   onDeleteArgument,
@@ -59,7 +59,7 @@ const ArgumentBuilderTab: React.FC<ArgumentBuilderTabProps> = ({
       
       {/* Arguments Section */}
       <ArgumentsSection 
-        arguments={arguments}
+        args={args} // Changed from 'arguments' to 'args'
         onAdd={onAddArgument}
         onDelete={onDeleteArgument}
         onDuplicate={onDuplicateArgument}

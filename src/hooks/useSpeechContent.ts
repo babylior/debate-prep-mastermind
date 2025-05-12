@@ -42,7 +42,7 @@ export const useSpeechContent = (role: string) => {
       if (savedNotes && savedNotes.speech) {
         if (savedNotes.speech.sections) {
           // Make sure we're getting the correct type
-          const savedSections = savedNotes.speech.sections as unknown;
+          const savedSections = savedNotes.speech.sections;
           if (Array.isArray(savedSections)) {
             setSections(savedSections as Section[]);
           }
@@ -50,7 +50,7 @@ export const useSpeechContent = (role: string) => {
         
         if (savedNotes.speech.content) {
           // Make sure we're getting the correct type
-          const savedContent = savedNotes.speech.content as unknown;
+          const savedContent = savedNotes.speech.content;
           setContent(savedContent as SpeechContent);
         }
       } else {
@@ -81,11 +81,12 @@ export const useSpeechContent = (role: string) => {
           lastUpdated: Date.now()
         };
         
-        notes.speech = {
-          ...notes.speech,
-          sections, // Type issue fixed
-          content   // Type issue fixed
-        };
+        if (!notes.speech) {
+          notes.speech = {};
+        }
+        
+        notes.speech.sections = sections;
+        notes.speech.content = content;
         
         saveNotes(notes);
         setSaveStatus('saved');
@@ -107,6 +108,12 @@ export const useSpeechContent = (role: string) => {
     if (item) {
       // Update the sections
       const updatedSections = [...sections];
+      
+      // Ensure the section has a content array
+      if (!updatedSections[sectionIndex].content) {
+        updatedSections[sectionIndex].content = [];
+      }
+      
       const sectionContent = updatedSections[sectionIndex].content || [];
       
       // Check if item already exists in this section

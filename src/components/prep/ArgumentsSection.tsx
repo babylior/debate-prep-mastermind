@@ -14,7 +14,7 @@ interface Argument {
 }
 
 interface ArgumentsSectionProps {
-  arguments: Argument[];
+  args: Argument[]; // Changed from 'arguments' to 'args'
   onAdd: () => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
@@ -29,7 +29,7 @@ interface ArgumentsSectionProps {
 }
 
 const ArgumentsSection: React.FC<ArgumentsSectionProps> = ({
-  arguments,
+  args, // Changed from 'arguments' to 'args'
   onAdd,
   onDelete,
   onDuplicate,
@@ -49,7 +49,7 @@ const ArgumentsSection: React.FC<ArgumentsSectionProps> = ({
       </div>
       
       <div className="space-y-6">
-        {arguments.map((arg, index) => (
+        {args.map((arg, index) => ( // Changed from 'arguments' to 'args'
           <div 
             key={arg.id} 
             onDragOver={(e) => onDragOver(e, index)}

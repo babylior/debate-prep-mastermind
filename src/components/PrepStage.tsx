@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -251,7 +250,7 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
               framing: notes.framing,
               notes: notes.notes
             }}
-            arguments={prepArguments}
+            args={prepArguments} // Changed from 'arguments' to 'args'
             onNotesChange={handleNoteChange}
             onAddArgument={addArgument}
             onDeleteArgument={deleteArgument}

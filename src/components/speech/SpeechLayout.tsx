@@ -35,14 +35,29 @@ const SpeechLayout: React.FC<SpeechLayoutProps> = ({
   onDrop
 }) => {
   // Transform sections to the format expected by SpeechStructurePanel
-  const formattedSections: PanelContent[] = sections.map(section => ({
-    title: section.name,
-    content: section.content.map(item => item.content).join('\n'),
-    type: section.content[0]?.type === 'rebuttal' ? 'rebuttal' : 
-          section.name.toLowerCase().includes('opening') ? 'opening' :
-          section.name.toLowerCase().includes('roadmap') ? 'roadmap' :
-          section.name.toLowerCase().includes('conclusion') ? 'conclusion' : 'argument'
-  }));
+  const formattedSections: PanelContent[] = sections.map(section => {
+    // Ensure section.content exists and is an array before calling map
+    const contentText = Array.isArray(section.content) 
+      ? section.content.map(item => item.content).join('\n')
+      : '';
+    
+    // Determine section type based on content or name
+    const contentType = Array.isArray(section.content) && section.content.length > 0 && section.content[0]?.type === 'rebuttal'
+      ? 'rebuttal'
+      : section.name.toLowerCase().includes('opening')
+        ? 'opening'
+        : section.name.toLowerCase().includes('roadmap')
+          ? 'roadmap'
+          : section.name.toLowerCase().includes('conclusion')
+            ? 'conclusion'
+            : 'argument';
+    
+    return {
+      title: section.name,
+      content: contentText,
+      type: contentType
+    };
+  });
 
   // Transform content for ContentPanel
   const transformedContent = {
