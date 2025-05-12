@@ -1,10 +1,7 @@
 
-// We need to modify the file to fix the type error with number and string
-// Let's ensure the updated code is in sync with the original functionality
-
 import { useState, useEffect } from 'react';
 import { roleContent } from '@/utils/debateData';
-import { saveToLocalStorage, loadFromLocalStorage } from '@/utils/localStorage';
+import { saveNotes, getNotes } from '@/utils/localStorage';
 
 export interface Content {
   id: string;
@@ -40,12 +37,13 @@ export const useSpeechContent = (role: string) => {
     const roleData = roleContent[role as keyof typeof roleContent];
     if (roleData && roleData.speech && roleData.speech.templateSections) {
       // Load from localStorage first if available
-      const savedSections = loadFromLocalStorage(`${role}-sections`);
-      const savedContent = loadFromLocalStorage(`${role}-content`);
-
-      if (savedSections && savedContent) {
-        setSections(savedSections);
-        setContent(savedContent);
+      const savedNotes = getNotes();
+      
+      if (savedNotes && savedNotes.speech && savedNotes.speech.sections) {
+        setSections(savedNotes.speech.sections);
+        if (savedNotes.speech.content) {
+          setContent(savedNotes.speech.content);
+        }
       } else {
         // Initialize with default sections
         const initialSections = roleData.speech.templateSections.map((section, index) => ({
@@ -65,8 +63,22 @@ export const useSpeechContent = (role: string) => {
     if (sections.length > 0) {
       setSaveStatus('saving');
       setTimeout(() => {
-        saveToLocalStorage(`${role}-sections`, sections);
-        saveToLocalStorage(`${role}-content`, content);
+        const notes = getNotes() || {
+          motion: '',
+          role,
+          prep: {},
+          listening: {},
+          speech: {},
+          lastUpdated: Date.now()
+        };
+        
+        notes.speech = {
+          ...notes.speech,
+          sections,
+          content
+        };
+        
+        saveNotes(notes);
         setSaveStatus('saved');
       }, 1000);
     }

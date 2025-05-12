@@ -3,9 +3,9 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Lightbulb } from "lucide-react";
 import ReviewLocations from "../ReviewLocations";
-import ExportButton from "@/components/ExportButton";
 import { DebateRole, debateRoles } from "@/utils/debateData";
 import { Section } from '@/hooks/useSpeechContent';
+import ExportButtonWrapper from "./ExportButtonWrapper";
 
 interface SpeechHeaderProps {
   role: string;
@@ -43,9 +43,9 @@ const SpeechHeader: React.FC<SpeechHeaderProps> = ({
             <span className="hidden sm:inline">Tips</span>
           </Button>
           <ReviewLocations />
-          <ExportButton 
+          <ExportButtonWrapper 
             motion={motion}
-            role={currentRole?.name || ''}
+            roleName={currentRole?.name || ''}
             sections={sections}
           />
           <Button variant="outline" onClick={onReset}>

@@ -54,7 +54,7 @@ const TipsPanel: React.FC<TipsPanelProps> = ({ role, content, isOpen, onClose })
         >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="main">Main Tips</TabsTrigger>
-            <TabsTrigger value="categories">Notes by Category</TabsTrigger>
+            <TabsTrigger value="categories">נטלים לפי קטגוריה</TabsTrigger>
           </TabsList>
           
           {/* Main Tips Tab */}
@@ -102,91 +102,91 @@ const TipsPanel: React.FC<TipsPanelProps> = ({ role, content, isOpen, onClose })
             )}
           </TabsContent>
           
-          {/* Notes by Category Tab */}
+          {/* Notes by Category Tab - In Hebrew */}
           <TabsContent value="categories" className="mt-0">
             <div className="p-4 space-y-1">
               <CategorySection 
-                title="Politics" 
+                title="פוליטיקה" 
                 icon={<Flag className="h-4 w-4" />}
                 items={[
-                  "What problem is the motion trying to solve?",
-                  "What is the central value in this debate? (liberty, equality, stability, justice, democracy)",
-                  "What is the central question that will decide the debate (Core Clash)?",
-                  "What clashes are likely to arise?",
-                  "What are the broadest implications of this policy?"
+                  "מהי הבעיה שהמושיין מנסה לפתור?",
+                  "מה הערך המרכזי בדיון? (חירות, שוויון, יציבות, צדק, דמוקרטיה)",
+                  "מה השאלה המרכזית שתכריע את הדיבייט (Core Clash)?",
+                  "אילו קלאשים צפויים לעלות?",
+                  "מהן ההשלכות הרחבות ביותר של המדיניות?"
                 ]}
               />
               
               <CategorySection 
-                title="Framing" 
+                title="פריימינג" 
                 icon={<Building className="h-4 w-4" />}
                 items={[
-                  "How will this policy be implemented in practice?",
-                  "Why will it work/fail? (Mechanism)",
-                  "What is the expected outcome of the policy?",
-                  "Are there possible side effects?"
+                  "איך המדיניות הזו תיושם בפועל?",
+                  "למה היא תעבוד/תיכשל? (Mechanism)",
+                  "מה התוצאה הצפויה של המדיניות?",
+                  "האם יש תופעות לוואי אפשריות?"
                 ]}
               />
               
               <CategorySection 
-                title="Arguments" 
+                title="טיעונים" 
                 icon={<ListOrdered className="h-4 w-4" />}
                 items={[
-                  "Who benefits and who loses from the policy?",
-                  "Is the infringement on rights justified?",
-                  "Does the policy create or reduce social gaps?",
-                  "What happens if we don't act?"
+                  "מי מרוויח ומי מפסיד מהמדיניות?",
+                  "האם הפגיעה בזכויות מוצדקת?",
+                  "האם המדיניות יוצרת או מצמצמת פערים חברתיים?",
+                  "מה יקרה אם לא נפעל?"
                 ]}
               />
               
               <CategorySection 
-                title="Economy" 
+                title="כלכלה" 
                 icon={<Coins className="h-4 w-4" />}
                 items={[
-                  "How will this affect wealth, growth, or economic burden?",
-                  "Who will bear the costs?",
-                  "Are there more cost-effective alternatives?"
+                  "איך זה ישפיע על עושר, צמיחה, או נטל כלכלי?",
+                  "מי יישא בעלויות?",
+                  "האם יש חלופות יותר יעילות כלכלית?"
                 ]}
               />
               
               <CategorySection 
-                title="Society" 
+                title="חברה" 
                 icon={<Building className="h-4 w-4" />}
                 items={[
-                  "How will this affect social cohesion or gaps?",
-                  "Does it encourage unity or create polarization?",
-                  "Does it reduce gaps or deepen them?"
+                  "איך זה ישפיע על לכידות חברתית או פערים?",
+                  "האם זה מעודד אחדות או יוצר קיטוב?",
+                  "האם זה מצמצם פערים או מעמיק אותם?"
                 ]}
               />
               
               <CategorySection 
-                title="Rights" 
+                title="זכויות" 
                 icon={<Shield className="h-4 w-4" />}
                 items={[
-                  "Does the policy violate fundamental rights, and if so, is it justified?",
-                  "Is there a moral obligation to act?",
-                  "Is there an injustice that requires correction?"
+                  "האם המדיניות פוגעת בזכויות יסוד, ואם כן, האם זה מוצדק?",
+                  "האם יש חובה מוסרית לפעול?",
+                  "האם יש אי-צדק שמחייב תיקון?"
                 ]}
               />
               
               <CategorySection 
-                title="International" 
+                title="בינלאומי" 
                 icon={<Globe className="h-4 w-4" />}
                 items={[
-                  "Does this strengthen the country's position globally?",
-                  "How will other countries react to this policy?",
-                  "Does it create diplomatic tensions?"
+                  "האם זה מחזק את מעמד המדינה בזירה הגלובלית?",
+                  "איך מדינות אחרות יגיבו למדיניות זו?",
+                  "האם זה יוצר מתחים דיפלומטיים?"
                 ]}
               />
               
               <CategorySection 
-                title="Alternatives" 
+                title="אלטרנטיבות" 
                 icon={<PlusCircle className="h-4 w-4" />}
                 items={[
-                  "What are other ways to solve the problem?",
-                  "Could a different policy achieve the same goal with fewer costs/violations?",
-                  "Is the status quo better than the proposed policy?",
-                  "Why is the alternative preferable to the policy?"
+                  "מהן דרכים אחרות לפתרון הבעיה?",
+                  "האם מדיניות שונה יכולה להשיג את אותה מטרה בפחות עלויות/פגיעות?",
+                  "האם הסטטוס-קוו עדיף על המדיניות המוצעת?",
+                  "למה האלטרנטיבה עדיפה על המדיניות?"
                 ]}
               />
             </div>
@@ -214,14 +214,14 @@ const CategorySection = ({ title, icon, items }: {
       >
         <div className="flex items-center">
           {icon}
-          <span className="ml-2 font-medium">{title}</span>
+          <span className="mr-2 font-medium">{title}</span>
         </div>
         <span>{isOpen ? '−' : '+'}</span>
       </Button>
       
       {isOpen && (
         <div className="p-3 bg-gray-50">
-          <ul className="list-disc pl-5 space-y-1.5 text-sm">
+          <ul className="list-disc pr-5 space-y-1.5 text-sm text-right">
             {items.map((item, idx) => (
               <li key={idx}>{item}</li>
             ))}
