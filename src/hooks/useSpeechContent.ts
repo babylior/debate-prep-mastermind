@@ -40,9 +40,9 @@ export const useSpeechContent = (role: string) => {
       const savedNotes = getNotes();
       
       if (savedNotes && savedNotes.speech && savedNotes.speech.sections) {
-        setSections(savedNotes.speech.sections);
+        setSections(savedNotes.speech.sections as Section[]);
         if (savedNotes.speech.content) {
-          setContent(savedNotes.speech.content);
+          setContent(savedNotes.speech.content as SpeechContent);
         }
       } else {
         // Initialize with default sections
@@ -74,8 +74,8 @@ export const useSpeechContent = (role: string) => {
         
         notes.speech = {
           ...notes.speech,
-          sections,
-          content
+          sections: sections,
+          content: content
         };
         
         saveNotes(notes);

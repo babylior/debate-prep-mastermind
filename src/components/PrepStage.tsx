@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,6 +12,7 @@ import { Lightbulb, Plus } from 'lucide-react';
 import TipsPanel from './TipsPanel';
 import PrepTabs from './PrepTabs';
 import { StatusBar } from '@/components/ui/status-bar';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface PrepStageProps {
   role: string;
@@ -32,7 +33,7 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
   
-  const [activeTab, setActiveTab] = useState<string>('framing');
+  const [activeTab, setActiveTab] = useState<string>('idea-dump');
   const [isTipsPanelOpen, setIsTipsPanelOpen] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   
@@ -46,7 +47,7 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
   
   const [prepArguments, setPrepArguments] = useState<Argument[]>([]);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
-  const [autoStartTimer, setAutoStartTimer] = useState(false); // Changed to false to allow starting timer before motion
+  const [autoStartTimer, setAutoStartTimer] = useState(false);
 
   // Initialize notes from localStorage
   useEffect(() => {
@@ -108,8 +109,8 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
 
   const handleTimerComplete = () => {
     toast({
-      title: "Time's up!",
-      description: "Your 15-minute preparation time is over.",
+      title: "הזמן נגמר!",
+      description: "זמן ההכנה של 15 דקות הסתיים.",
     });
   };
   
@@ -142,8 +143,8 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
     
     // Show feedback
     toast({
-      title: "Argument added",
-      description: "A new argument card has been added.",
+      title: "טיעון נוסף",
+      description: "כרטיס טיעון חדש נוסף.",
     });
   };
   
@@ -235,63 +236,18 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'framing':
-        return (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Framing & Context</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="Define the debate framing and key contexts..."
-                  className="min-h-[150px]"
-                  value={notes.framing}
-                  onChange={(e) => handleNoteChange('framing', e.target.value)}
-                />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Problem/Current Situation</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="Define the problem or current situation..."
-                  className="min-h-[150px]"
-                  value={notes.problem}
-                  onChange={(e) => handleNoteChange('problem', e.target.value)}
-                />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Mechanism/Solution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="Describe your mechanism or approach..."
-                  className="min-h-[150px]"
-                  value={notes.mechanism}
-                  onChange={(e) => handleNoteChange('mechanism', e.target.value)}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        );
-      
       case 'idea-dump':
         return (
-          <Card>
+          <Card className="bg-white shadow-md">
             <CardHeader>
-              <CardTitle>Idea Dump</CardTitle>
+              <CardTitle>רעיונות ראשוניים</CardTitle>
+              <CardDescription>רשום כאן את כל הרעיונות הראשוניים שלך, לפני ארגון הטיעונים</CardDescription>
             </CardHeader>
             <CardContent>
               <Textarea
-                placeholder="Write down all your ideas here. Don't worry about organization yet, just get your thoughts out..."
-                className="min-h-[400px]"
+                placeholder="כתוב כאן את כל הרעיונות שלך. אל תדאג לארגון בשלב זה, פשוט כתוב את כל מה שעולה לך בראש..."
+                className="min-h-[400px] rtl"
+                dir="rtl"
                 value={notes.ideaDump}
                 onChange={(e) => handleNoteChange('ideaDump', e.target.value)}
               />
@@ -301,54 +257,114 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
       
       case 'argument-builder':
         return (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Arguments</h2>
-              <Button onClick={addArgument}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Argument
-              </Button>
+          <div className="space-y-6">
+            {/* Framing Section */}
+            <Accordion type="single" collapsible className="w-full bg-white shadow-md rounded-lg">
+              <AccordionItem value="framing">
+                <AccordionTrigger className="px-4 py-2 font-bold text-lg">פריימינג והקשר</AccordionTrigger>
+                <AccordionContent className="px-4 pb-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>בעיה/מצב נוכחי</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea
+                            placeholder="הגדר את הבעיה או המצב הנוכחי..."
+                            className="min-h-[150px] rtl"
+                            dir="rtl"
+                            value={notes.problem}
+                            onChange={(e) => handleNoteChange('problem', e.target.value)}
+                          />
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>מנגנון/פתרון</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea
+                            placeholder="תאר את המנגנון או הגישה שלך..."
+                            className="min-h-[150px] rtl"
+                            dir="rtl"
+                            value={notes.mechanism}
+                            onChange={(e) => handleNoteChange('mechanism', e.target.value)}
+                          />
+                        </CardContent>
+                      </Card>
+                    </div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>פריימינג כללי</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Textarea
+                          placeholder="הגדר את מסגרת הדיון וההקשרים המרכזיים..."
+                          className="min-h-[150px] rtl"
+                          dir="rtl"
+                          value={notes.framing}
+                          onChange={(e) => handleNoteChange('framing', e.target.value)}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            
+            {/* Arguments Section */}
+            <div className="bg-white shadow-md rounded-lg p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">טיעונים</h2>
+                <Button onClick={addArgument} className="flex items-center gap-2 bg-primary hover:bg-primary/90">
+                  <Plus className="h-4 w-4 mr-2" />
+                  הוסף טיעון
+                </Button>
+              </div>
+              
+              <div className="space-y-6">
+                {prepArguments.map((arg, index) => (
+                  <div 
+                    key={arg.id} 
+                    onDragOver={(e) => handleDragOver(e, index)}
+                  >
+                    <DraggableArgumentCard
+                      id={arg.id}
+                      claim={arg.claim}
+                      whyTrue={arg.whyTrue}
+                      mechanism={arg.mechanism}
+                      impact={arg.impact}
+                      weighing={arg.weighing}
+                      index={index}
+                      onDelete={deleteArgument}
+                      onDuplicate={duplicateArgument}
+                      onChange={updateArgument}
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             
-            {prepArguments.map((arg, index) => (
-              <div 
-                key={arg.id} 
-                onDragOver={(e) => handleDragOver(e, index)}
-              >
-                <DraggableArgumentCard
-                  id={arg.id}
-                  claim={arg.claim}
-                  whyTrue={arg.whyTrue}
-                  mechanism={arg.mechanism}
-                  impact={arg.impact}
-                  weighing={arg.weighing}
-                  index={index}
-                  onDelete={deleteArgument}
-                  onDuplicate={duplicateArgument}
-                  onChange={updateArgument}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
+            {/* Rebuttals Section */}
+            <Card className="bg-white shadow-md">
+              <CardHeader>
+                <CardTitle>הכנת תשובות לטיעוני הצד השני</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="הכן תשובות אפשריות לטיעונים של הצד השני..."
+                  className="min-h-[200px] rtl"
+                  dir="rtl"
+                  value={notes.notes}
+                  onChange={(e) => handleNoteChange('notes', e.target.value)}
                 />
-              </div>
-            ))}
+              </CardContent>
+            </Card>
           </div>
-        );
-      
-      case 'rebuttal-builder':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Rebuttal Preparation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="Prepare potential rebuttals to opposing arguments..."
-                className="min-h-[400px]"
-                value={notes.notes}
-                onChange={(e) => handleNoteChange('notes', e.target.value)}
-              />
-            </CardContent>
-          </Card>
         );
       
       default:
@@ -357,11 +373,11 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <div className="bg-white rounded-lg shadow-sm border p-4 mb-6 flex justify-between items-center">
+    <div className="max-w-6xl mx-auto p-4" dir="rtl">
+      <div className="bg-white rounded-lg shadow-md border p-4 mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{roleData.prep.title}</h1>
-          <p className="text-gray-600 mt-1">{motion || "Preparing without motion"}</p>
+          <p className="text-gray-600 mt-1">{motion || "הכנה ללא מושיין"}</p>
         </div>
         
         <div className="flex gap-2">
@@ -371,24 +387,26 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
             className="flex items-center gap-2"
           >
             <Lightbulb className="h-4 w-4" />
-            <span className="hidden sm:inline">Tips & Resources</span>
+            <span className="hidden sm:inline">טיפים ומקורות</span>
           </Button>
         </div>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left Column - Timer */}
-        <div className="lg:col-span-1">
-          <Timer 
-            initialTime={15 * 60} // 15 minutes in seconds
-            timerLabel="Prep Time"
-            onComplete={handleTimerComplete}
-            autoStart={autoStartTimer}
-          />
+        <div className="lg:col-span-1 order-2 lg:order-1">
+          <div className="sticky top-4">
+            <Timer 
+              initialTime={15 * 60} // 15 minutes in seconds
+              timerLabel="זמן הכנה"
+              onComplete={handleTimerComplete}
+              autoStart={autoStartTimer}
+            />
+          </div>
         </div>
         
         {/* Right Column - Tabbed Content */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-3 space-y-4 order-1 lg:order-2">
           <PrepTabs 
             activeTab={activeTab} 
             onTabChange={setActiveTab} 
@@ -396,9 +414,9 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
           
           {renderTabContent()}
           
-          <div className="text-right mt-6">
-            <Button onClick={onComplete} size="lg">
-              Continue to Listening Stage
+          <div className="text-left mt-6 lg:mt-10">
+            <Button onClick={onComplete} size="lg" className="px-8 py-2">
+              המשך לשלב ההקשבה
             </Button>
           </div>
         </div>

@@ -11,11 +11,9 @@ const PrepTabs: React.FC<PrepTabsProps> = ({ activeTab, onTabChange }) => {
   return (
     <div className="mb-6">
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-        <TabsList className="grid grid-cols-4 w-full">
-          <TabsTrigger value="framing">Framing</TabsTrigger>
-          <TabsTrigger value="idea-dump">Idea Dump</TabsTrigger>
-          <TabsTrigger value="argument-builder">Argument Builder</TabsTrigger>
-          <TabsTrigger value="rebuttal-builder">Rebuttal Builder</TabsTrigger>
+        <TabsList className="grid grid-cols-2 w-full">
+          <TabsTrigger value="idea-dump">רעיונות ראשוניים</TabsTrigger>
+          <TabsTrigger value="argument-builder">בניית הנאום</TabsTrigger>
         </TabsList>
       </Tabs>
     </div>
