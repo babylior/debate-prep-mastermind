@@ -42,18 +42,22 @@ const SpeechLayout: React.FC<SpeechLayoutProps> = ({
       : '';
     
     // Determine section type based on content or name
-    const contentType = Array.isArray(section.content) && section.content.length > 0 && section.content[0]?.type === 'rebuttal'
+    // Add null checks to prevent accessing toLowerCase on undefined
+    const sectionName = section.name || ''; // Default to empty string if undefined
+    const contentType = Array.isArray(section.content) && 
+                       section.content.length > 0 && 
+                       section.content[0]?.type === 'rebuttal'
       ? 'rebuttal'
-      : section.name.toLowerCase().includes('opening')
+      : sectionName.toLowerCase().includes('opening')
         ? 'opening'
-        : section.name.toLowerCase().includes('roadmap')
+        : sectionName.toLowerCase().includes('roadmap')
           ? 'roadmap'
-          : section.name.toLowerCase().includes('conclusion')
+          : sectionName.toLowerCase().includes('conclusion')
             ? 'conclusion'
             : 'argument';
     
     return {
-      title: section.name,
+      title: section.name || '', // Default to empty string if undefined
       content: contentText,
       type: contentType
     };
