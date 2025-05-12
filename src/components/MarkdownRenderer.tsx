@@ -11,16 +11,16 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
   // Process markdown formatting
   let formattedText = text
     // Bold: **text**
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-black">$1</strong>')
     // Italic: *text*
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\*(.*?)\*/g, '<em class="italic text-black">$1</em>')
     // Highlight: ===text===
-    .replace(/===(.*?)===/g, '<mark class="bg-yellow-200 px-1">$1</mark>');
+    .replace(/===(.*?)===/g, '<mark class="bg-yellow-200 px-1 rounded-sm transition-all duration-200">$1</mark>');
   
   // Replace newlines with <br> tags
   formattedText = formattedText.replace(/\n/g, '<br />');
 
-  return <div dangerouslySetInnerHTML={{ __html: formattedText }} />;
+  return <div dangerouslySetInnerHTML={{ __html: formattedText }} className="prose" />;
 };
 
 export default MarkdownRenderer;

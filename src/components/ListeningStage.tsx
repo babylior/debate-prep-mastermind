@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,13 +20,20 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
   const currentRole = debateRoles.find(r => r.id === role);
-  const currentOrder = currentRole?.order || 1;
   
   const [teamNotes, setTeamNotes] = useState({
     og: '',
     oo: '',
     cg: '',
-    co: ''
+    co: '',
+    ogRebuttal: '',
+    ooRebuttal: '',
+    cgRebuttal: '',
+    coRebuttal: '',
+    ogComparison: '',
+    ooComparison: '',
+    cgComparison: '',
+    coComparison: ''
   });
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -39,13 +47,21 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
           og: savedNotes.teamNotes.og || '',
           oo: savedNotes.teamNotes.oo || '',
           cg: savedNotes.teamNotes.cg || '',
-          co: savedNotes.teamNotes.co || ''
+          co: savedNotes.teamNotes.co || '',
+          ogRebuttal: savedNotes.teamNotes.ogRebuttal || '',
+          ooRebuttal: savedNotes.teamNotes.ooRebuttal || '',
+          cgRebuttal: savedNotes.teamNotes.cgRebuttal || '',
+          coRebuttal: savedNotes.teamNotes.coRebuttal || '',
+          ogComparison: savedNotes.teamNotes.ogComparison || '',
+          ooComparison: savedNotes.teamNotes.ooComparison || '',
+          cgComparison: savedNotes.teamNotes.cgComparison || '',
+          coComparison: savedNotes.teamNotes.coComparison || ''
         });
       }
     }
   }, [role, motion]);
 
-  const handleTeamNoteChange = (team: 'og' | 'oo' | 'cg' | 'co', value: string) => {
+  const handleTeamNoteChange = (team: keyof typeof teamNotes, value: string) => {
     setSaveStatus('saving');
     const updatedTeamNotes = {
       ...teamNotes,
@@ -102,6 +118,17 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
       </div>
       
       <div className="mb-6">
+        <Card className="p-4 mb-4">
+          <p className="text-gray-700 text-sm mb-2">
+            עכשיו אפשר לסמן טקסט ולהפוך אותו לטקסט מודגש, נטוי או מסומן בכל הטפסים.
+            השתמש בכפתורים כדי להוסיף עיצוב לטקסט שבחרת.
+          </p>
+          <div className="flex gap-2 text-sm">
+            <span className="font-bold">**טקסט מודגש**</span>
+            <span className="italic">*טקסט נטוי*</span>
+            <span className="bg-yellow-200 px-1 rounded-sm">===טקסט מסומן===</span>
+          </div>
+        </Card>
         <TeamNotesGrid 
           notes={teamNotes} 
           onChange={handleTeamNoteChange} 
