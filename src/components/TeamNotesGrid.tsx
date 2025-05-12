@@ -104,6 +104,9 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
                   onBold={formatHandlers[teamKey].handleBold}
                   onItalic={formatHandlers[teamKey].handleItalic}
                   onHighlight={formatHandlers[teamKey].handleHighlight}
+                  onRedColor={formatHandlers[teamKey].handleRedColor}
+                  onBlueColor={formatHandlers[teamKey].handleBlueColor}
+                  onBlackColor={formatHandlers[teamKey].handleBlackColor}
                   className="min-h-[100px] resize-vertical"
                   placeholder={`Note key arguments from ${team.toUpperCase()}...`}
                 />
@@ -124,6 +127,9 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
                   onBold={formatHandlers[rebuttalKey].handleBold}
                   onItalic={formatHandlers[rebuttalKey].handleItalic}
                   onHighlight={formatHandlers[rebuttalKey].handleHighlight}
+                  onRedColor={formatHandlers[rebuttalKey].handleRedColor}
+                  onBlueColor={formatHandlers[rebuttalKey].handleBlueColor}
+                  onBlackColor={formatHandlers[rebuttalKey].handleBlackColor}
                   className="min-h-[100px] resize-vertical"
                   placeholder="How would you respond to this speaker's case?"
                 />
@@ -144,6 +150,9 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
                   onBold={formatHandlers[comparisonKey].handleBold}
                   onItalic={formatHandlers[comparisonKey].handleItalic}
                   onHighlight={formatHandlers[comparisonKey].handleHighlight}
+                  onRedColor={formatHandlers[comparisonKey].handleRedColor}
+                  onBlueColor={formatHandlers[comparisonKey].handleBlueColor}
+                  onBlackColor={formatHandlers[comparisonKey].handleBlackColor}
                   className="min-h-[100px] resize-vertical"
                   placeholder="How does your case compare to theirs?"
                 />

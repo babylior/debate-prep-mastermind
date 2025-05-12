@@ -128,9 +128,9 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
               handleBold, 
               handleItalic, 
               handleHighlight,
-              handlePurpleColor,
+              handleRedColor,
               handleBlueColor,
-              handleGreenColor
+              handleBlackColor
             } = useTextFormat({
               value: values[key],
               onChange: (newValue) => onChange(id, key, newValue)
@@ -153,9 +153,9 @@ const DraggableArgumentCard: React.FC<DraggableArgumentCardProps> = ({
                   onBold={handleBold}
                   onItalic={handleItalic}
                   onHighlight={handleHighlight}
-                  onPurpleColor={handlePurpleColor}
+                  onRedColor={handleRedColor}
                   onBlueColor={handleBlueColor}
-                  onGreenColor={handleGreenColor}
+                  onBlackColor={handleBlackColor}
                 />
               </div>
             );

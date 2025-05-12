@@ -8,20 +8,20 @@ export interface TextareaProps
   onBold?: () => void;
   onItalic?: () => void;
   onHighlight?: () => void;
-  onPurpleColor?: () => void;
+  onRedColor?: () => void;
   onBlueColor?: () => void;
-  onGreenColor?: () => void;
+  onBlackColor?: () => void;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, onBold, onItalic, onHighlight, onPurpleColor, onBlueColor, onGreenColor, ...props }, ref) => {
+  ({ className, onBold, onItalic, onHighlight, onRedColor, onBlueColor, onBlackColor, ...props }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
     // Initialize auto-resize
     useAutoResize(textareaRef);
 
     return (
       <div className="flex flex-col w-full">
-        {(onBold || onItalic || onHighlight || onPurpleColor || onBlueColor || onGreenColor) && (
+        {(onBold || onItalic || onHighlight || onRedColor || onBlueColor || onBlackColor) && (
           <div className="flex items-center mb-1 gap-1 flex-wrap">
             {/* Text style buttons */}
             <div className="flex gap-1 mr-2">
@@ -59,14 +59,14 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
             {/* Color buttons */}
             <div className="flex gap-1">
-              {onPurpleColor && (
+              {onRedColor && (
                 <button 
                   type="button" 
-                  onClick={onPurpleColor} 
+                  onClick={onRedColor} 
                   className="p-1 hover:bg-gray-200 rounded"
-                  title="Purple Text"
+                  title="Red Text"
                 >
-                  <span className="text-purple-600 font-bold">A</span>
+                  <span className="text-red-600 font-bold">A</span>
                 </button>
               )}
               {onBlueColor && (
@@ -79,14 +79,14 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
                   <span className="text-blue-600 font-bold">A</span>
                 </button>
               )}
-              {onGreenColor && (
+              {onBlackColor && (
                 <button 
                   type="button" 
-                  onClick={onGreenColor} 
+                  onClick={onBlackColor} 
                   className="p-1 hover:bg-gray-200 rounded"
-                  title="Green Text"
+                  title="Black Text"
                 >
-                  <span className="text-green-600 font-bold">A</span>
+                  <span className="text-black font-bold">A</span>
                 </button>
               )}
             </div>

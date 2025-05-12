@@ -15,9 +15,9 @@ const IdeaDumpTab: React.FC<IdeaDumpTabProps> = ({ notes, onChange }) => {
     handleBold, 
     handleItalic, 
     handleHighlight,
-    handlePurpleColor,
+    handleRedColor,
     handleBlueColor,
-    handleGreenColor
+    handleBlackColor
   } = useTextFormat({
     value: notes,
     onChange
@@ -41,14 +41,14 @@ const IdeaDumpTab: React.FC<IdeaDumpTabProps> = ({ notes, onChange }) => {
           onBold={handleBold}
           onItalic={handleItalic}
           onHighlight={handleHighlight}
-          onPurpleColor={handlePurpleColor}
+          onRedColor={handleRedColor}
           onBlueColor={handleBlueColor}
-          onGreenColor={handleGreenColor}
+          onBlackColor={handleBlackColor}
         />
         <div className="mt-2 text-sm text-gray-500 rtl" dir="rtl">
           <p>טיפ: סמן טקסט כלשהו ולחץ על הכפתורים למעלה כדי להוסיף עיצוב.</p>
           <p>**טקסט מודגש** ← מודגש | *טקסט נטוי* ← נטוי | ===טקסט מסומן=== ← מסומן</p>
-          <p>@@purple:טקסט סגול@@ | @@blue:טקסט כחול@@ | @@green:טקסט ירוק@@</p>
+          <p>@@red:טקסט אדום@@ | @@blue:טקסט כחול@@ | @@black:טקסט שחור@@</p>
         </div>
       </CardContent>
     </Card>

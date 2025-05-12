@@ -15,9 +15,9 @@ const RebuttalSection: React.FC<RebuttalSectionProps> = ({ notes, onChange }) =>
     handleBold, 
     handleItalic, 
     handleHighlight,
-    handlePurpleColor,
+    handleRedColor,
     handleBlueColor,
-    handleGreenColor
+    handleBlackColor
   } = useTextFormat({
     value: notes,
     onChange
@@ -40,9 +40,9 @@ const RebuttalSection: React.FC<RebuttalSectionProps> = ({ notes, onChange }) =>
           onBold={handleBold}
           onItalic={handleItalic}
           onHighlight={handleHighlight}
-          onPurpleColor={handlePurpleColor}
+          onRedColor={handleRedColor}
           onBlueColor={handleBlueColor}
-          onGreenColor={handleGreenColor}
+          onBlackColor={handleBlackColor}
         />
       </CardContent>
     </Card>

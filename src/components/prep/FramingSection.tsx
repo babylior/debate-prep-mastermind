@@ -51,9 +51,9 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                     onBold={problemFormatting.handleBold}
                     onItalic={problemFormatting.handleItalic}
                     onHighlight={problemFormatting.handleHighlight}
-                    onPurpleColor={problemFormatting.handlePurpleColor}
+                    onRedColor={problemFormatting.handleRedColor}
                     onBlueColor={problemFormatting.handleBlueColor}
-                    onGreenColor={problemFormatting.handleGreenColor}
+                    onBlackColor={problemFormatting.handleBlackColor}
                   />
                 </CardContent>
               </Card>
@@ -74,9 +74,9 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                     onBold={mechanismFormatting.handleBold}
                     onItalic={mechanismFormatting.handleItalic}
                     onHighlight={mechanismFormatting.handleHighlight}
-                    onPurpleColor={mechanismFormatting.handlePurpleColor}
+                    onRedColor={mechanismFormatting.handleRedColor}
                     onBlueColor={mechanismFormatting.handleBlueColor}
-                    onGreenColor={mechanismFormatting.handleGreenColor}
+                    onBlackColor={mechanismFormatting.handleBlackColor}
                   />
                 </CardContent>
               </Card>
@@ -97,9 +97,9 @@ const FramingSection: React.FC<FramingSectionProps> = ({ problem, mechanism, fra
                   onBold={framingFormatting.handleBold}
                   onItalic={framingFormatting.handleItalic}
                   onHighlight={framingFormatting.handleHighlight}
-                  onPurpleColor={framingFormatting.handlePurpleColor}
+                  onRedColor={framingFormatting.handleRedColor}
                   onBlueColor={framingFormatting.handleBlueColor}
-                  onGreenColor={framingFormatting.handleGreenColor}
+                  onBlackColor={framingFormatting.handleBlackColor}
                 />
               </CardContent>
             </Card>

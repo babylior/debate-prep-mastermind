@@ -16,7 +16,7 @@ export const useTextFormat = ({ value, onChange }: TextFormatOptions) => {
     setSelectionEnd(textarea.selectionEnd);
   };
 
-  const applyFormat = useCallback((format: 'bold' | 'italic' | 'highlight' | 'purple' | 'blue' | 'green') => {
+  const applyFormat = useCallback((format: 'bold' | 'italic' | 'highlight' | 'red' | 'blue' | 'black') => {
     if (selectionStart === null || selectionEnd === null || selectionStart === selectionEnd) {
       return;
     }
@@ -36,14 +36,14 @@ export const useTextFormat = ({ value, onChange }: TextFormatOptions) => {
       case 'highlight':
         formattedText = `${beforeSelection}===${selection}===${afterSelection}`;
         break;
-      case 'purple':
-        formattedText = `${beforeSelection}@@purple:${selection}@@${afterSelection}`;
+      case 'red':
+        formattedText = `${beforeSelection}@@red:${selection}@@${afterSelection}`;
         break;
       case 'blue':
         formattedText = `${beforeSelection}@@blue:${selection}@@${afterSelection}`;
         break;
-      case 'green':
-        formattedText = `${beforeSelection}@@green:${selection}@@${afterSelection}`;
+      case 'black':
+        formattedText = `${beforeSelection}@@black:${selection}@@${afterSelection}`;
         break;
       default:
         return;
@@ -55,17 +55,17 @@ export const useTextFormat = ({ value, onChange }: TextFormatOptions) => {
   const handleBold = useCallback(() => applyFormat('bold'), [applyFormat]);
   const handleItalic = useCallback(() => applyFormat('italic'), [applyFormat]);
   const handleHighlight = useCallback(() => applyFormat('highlight'), [applyFormat]);
-  const handlePurpleColor = useCallback(() => applyFormat('purple'), [applyFormat]);
+  const handleRedColor = useCallback(() => applyFormat('red'), [applyFormat]);
   const handleBlueColor = useCallback(() => applyFormat('blue'), [applyFormat]);
-  const handleGreenColor = useCallback(() => applyFormat('green'), [applyFormat]);
+  const handleBlackColor = useCallback(() => applyFormat('black'), [applyFormat]);
 
   return {
     handleSelection,
     handleBold,
     handleItalic,
     handleHighlight,
-    handlePurpleColor,
+    handleRedColor,
     handleBlueColor,
-    handleGreenColor,
+    handleBlackColor,
   };
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface MarkdownRendererProps {
@@ -17,8 +16,11 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text }) => {
     // Highlight: ===text===
     .replace(/===(.*?)===/g, '<mark class="bg-yellow-200 px-1 rounded-sm transition-all duration-200">$1</mark>')
     // Color formatting: @@color:text@@
-    .replace(/@@purple:(.*?)@@/g, '<span class="text-purple-600">$1</span>')
+    .replace(/@@red:(.*?)@@/g, '<span class="text-red-600">$1</span>')
     .replace(/@@blue:(.*?)@@/g, '<span class="text-blue-600">$1</span>')
+    .replace(/@@black:(.*?)@@/g, '<span class="text-black">$1</span>')
+    // Keep these for backward compatibility
+    .replace(/@@purple:(.*?)@@/g, '<span class="text-purple-600">$1</span>')
     .replace(/@@green:(.*?)@@/g, '<span class="text-green-600">$1</span>');
   
   // Replace newlines with <br> tags
