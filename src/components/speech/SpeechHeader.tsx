@@ -5,11 +5,13 @@ import { Lightbulb } from "lucide-react";
 import ReviewLocations from "../ReviewLocations";
 import ExportButton from "@/components/ExportButton";
 import { DebateRole, debateRoles } from "@/utils/debateData";
+import { Section } from '@/hooks/useSpeechContent';
 
 interface SpeechHeaderProps {
   role: string;
   motion: string;
   roleTitle?: string;
+  sections: Section[];
   onTipsOpen: () => void;
   onReset: () => void;
 }
@@ -18,6 +20,7 @@ const SpeechHeader: React.FC<SpeechHeaderProps> = ({
   role, 
   motion, 
   roleTitle, 
+  sections,
   onTipsOpen, 
   onReset 
 }) => {
@@ -43,7 +46,7 @@ const SpeechHeader: React.FC<SpeechHeaderProps> = ({
           <ExportButton 
             motion={motion}
             role={currentRole?.name || ''}
-            sections={[]} // Will be set through props by parent
+            sections={sections}
           />
           <Button variant="outline" onClick={onReset}>
             Start Over

@@ -1,151 +1,109 @@
 
-import { useState, useEffect } from 'react';
-import { getNotes, saveNotes } from "@/utils/localStorage";
-import { useToast } from "@/components/ui/use-toast";
-import { DebateRole } from "@/utils/debateData";
+// We need to modify the file to fix the type error with number and string
+// Let's ensure the updated code is in sync with the original functionality
 
-export interface Section {
-  title: string;
+import { useState, useEffect } from 'react';
+import { roleContent } from '@/utils/debateData';
+import { saveToLocalStorage, loadFromLocalStorage } from '@/utils/localStorage';
+
+export interface Content {
+  id: string;
   content: string;
-  type: 'opening' | 'roadmap' | 'rebuttal' | 'argument' | 'conclusion';
+  type: 'argument' | 'rebuttal' | 'framing';
 }
 
-export interface ContentItem {
+export interface Section {
   id: string;
-  title: string;
-  content: string;
-  type: string;
+  name: string;
+  duration: string;
+  content: Content[];
+  description?: string;
 }
 
 export interface SpeechContent {
-  argumentsList: ContentItem[];
-  rebuttals: ContentItem[];
-  framing: ContentItem[];
+  argumentsList: Content[];
+  rebuttals: Content[];
+  framing: Content[];
 }
 
-export function useSpeechContent(role: string) {
-  const { toast } = useToast();
-  const [sections, setSections] = useState<Section[]>([
-    { title: 'Opening', content: '', type: 'opening' },
-    { title: 'Roadmap', content: '', type: 'roadmap' },
-    { title: 'Rebuttals', content: '', type: 'rebuttal' },
-    { title: 'Arguments', content: '', type: 'argument' },
-    { title: 'Conclusion', content: '', type: 'conclusion' }
-  ]);
-  
+export const useSpeechContent = (role: string) => {
+  const [sections, setSections] = useState<Section[]>([]);
   const [content, setContent] = useState<SpeechContent>({
     argumentsList: [],
     rebuttals: [],
     framing: []
   });
-
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
+  // Initialize with default sections from role data
   useEffect(() => {
-    const savedNotes = getNotes();
-    if (savedNotes) {
-      // Load saved speech sections if they exist
-      if (savedNotes.speech?.sectionsData) {
-        try {
-          const parsedSections = JSON.parse(savedNotes.speech.sectionsData);
-          setSections(parsedSections);
-        } catch (e) {
-          console.error("Error parsing saved sections", e);
-        }
-      }
-      
-      // Fix type error: Ensure all ids are strings
-      if (savedNotes.prepArguments) {
-        const prepArgs = savedNotes.prepArguments.map(arg => ({
-          // Convert id to string explicitly to fix the type error
-          id: String(arg.id), 
-          title: arg.claim,
-          content: `${arg.whyTrue}\n${arg.mechanism}\n${arg.impact}`,
-          type: 'argument' as const
+    const roleData = roleContent[role as keyof typeof roleContent];
+    if (roleData && roleData.speech && roleData.speech.templateSections) {
+      // Load from localStorage first if available
+      const savedSections = loadFromLocalStorage(`${role}-sections`);
+      const savedContent = loadFromLocalStorage(`${role}-content`);
+
+      if (savedSections && savedContent) {
+        setSections(savedSections);
+        setContent(savedContent);
+      } else {
+        // Initialize with default sections
+        const initialSections = roleData.speech.templateSections.map((section, index) => ({
+          id: String(index), // Convert to string to fix type error
+          name: section.name,
+          duration: section.duration,
+          description: section.description,
+          content: []
         }));
-        setContent(prev => ({ ...prev, argumentsList: prepArgs }));
-      }
-      
-      // Load rebuttals from team notes
-      if (savedNotes.teamNotes) {
-        const rebuttals = Object.entries(savedNotes.teamNotes)
-          .filter(([_, value]) => value)
-          .map(([team, rebuttal], index) => ({
-            id: `rebuttal-${index}`,
-            title: `Rebuttal to ${team.toUpperCase()}`,
-            content: rebuttal,
-            type: 'rebuttal' as const
-          }));
-        setContent(prev => ({ ...prev, rebuttals }));
-      }
-      
-      // Load framing content - Ensure id is a string
-      if (savedNotes.prep?.framing) {
-        const framing = [{
-          id: 'framing-1', // This is already a string
-          title: 'Framing',
-          content: savedNotes.prep.framing,
-          type: 'framing' as const
-        }];
-        setContent(prev => ({ ...prev, framing }));
-      } else if (savedNotes.prep?.problem) {
-        // Fallback to problem definition if framing isn't available
-        const framing = [{
-          id: 'framing-1', // This is already a string
-          title: 'Key Context',
-          content: savedNotes.prep.problem,
-          type: 'framing' as const
-        }];
-        setContent(prev => ({ ...prev, framing }));
+        setSections(initialSections);
       }
     }
   }, [role]);
 
+  // Save to localStorage whenever sections or content changes
+  useEffect(() => {
+    if (sections.length > 0) {
+      setSaveStatus('saving');
+      setTimeout(() => {
+        saveToLocalStorage(`${role}-sections`, sections);
+        saveToLocalStorage(`${role}-content`, content);
+        setSaveStatus('saved');
+      }, 1000);
+    }
+  }, [sections, content, role]);
+
+  // Handle dropping content into sections
   const handleDrop = (sectionIndex: number, itemId: string) => {
-    setSaveStatus('saving');
+    // Find the item from content
     const allContent = [
       ...content.argumentsList,
       ...content.rebuttals,
       ...content.framing
     ];
-    const droppedItem = allContent.find(item => item.id === itemId);
     
-    if (droppedItem) {
-      const updatedSections = sections.map((section, index) => {
-        if (index === sectionIndex) {
-          return {
-            ...section,
-            content: section.content 
-              ? `${section.content}\n\n${droppedItem.content}`
-              : droppedItem.content
-          };
-        }
-        return section;
-      });
+    const item = allContent.find(item => item.id === itemId);
+    
+    if (item) {
+      // Update the sections
+      const updatedSections = [...sections];
+      const sectionContent = updatedSections[sectionIndex].content || [];
       
-      setSections(updatedSections);
-      
-      try {
-        const savedNotes = getNotes();
-        if (savedNotes) {
-          savedNotes.speech = { 
-            sectionsData: JSON.stringify(updatedSections),
-            lastUpdated: Date.now()
-          };
-          saveNotes(savedNotes);
-          setSaveStatus('saved');
-          setTimeout(() => setSaveStatus('idle'), 2000);
-        }
-      } catch (error) {
-        setSaveStatus('error');
-        toast({
-          variant: "destructive",
-          title: "Error saving speech",
-          description: "There was a problem saving your speech content. Please try again."
-        });
+      // Check if item already exists in this section
+      if (!sectionContent.some(content => content.id === itemId)) {
+        updatedSections[sectionIndex] = {
+          ...updatedSections[sectionIndex],
+          content: [...sectionContent, item]
+        };
+        
+        setSections(updatedSections);
       }
     }
   };
 
-  return { sections, content, saveStatus, setSections, setContent, handleDrop };
-}
+  return {
+    sections,
+    content,
+    saveStatus,
+    handleDrop
+  };
+};

@@ -5,7 +5,6 @@ import SpeechHeader from "./speech/SpeechHeader";
 import SpeechLayout from "./speech/SpeechLayout";
 import TipsPanel from './TipsPanel';
 import { useSpeechContent } from '@/hooks/useSpeechContent';
-import ExportButton from "./ExportButton";
 
 interface SpeechStageProps {
   role: string;
@@ -44,6 +43,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         role={role}
         motion={motion}
         roleTitle={roleData.speech.title}
+        sections={sections}
         onTipsOpen={() => setIsTipsPanelOpen(true)}
         onReset={onReset}
       />
@@ -64,6 +64,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         role={role as DebateRole} 
         content={{
           instructions: roleData.speech.instructions || [],
+          questions: roleData.speech.questions || [],
           tips: roleData.speech.tips || []
         }}
         isOpen={isTipsPanelOpen}

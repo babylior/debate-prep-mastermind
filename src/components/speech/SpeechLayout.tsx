@@ -52,9 +52,9 @@ const SpeechLayout: React.FC<SpeechLayoutProps> = ({
             </CardHeader>
             <CardContent>
               <ContentPanel
-                argumentsList={content.argumentsList}
-                rebuttals={content.rebuttals}
-                framing={content.framing}
+                argumentsList={content.argumentsList || []}
+                rebuttals={content.rebuttals || []}
+                framing={content.framing || []}
               />
             </CardContent>
           </Card>
