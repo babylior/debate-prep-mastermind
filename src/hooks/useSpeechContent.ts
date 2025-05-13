@@ -32,7 +32,7 @@ export const useSpeechContent = (role: string) => {
   });
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
-  // Initialize with default sections from role data
+  // Initialize with default sections from role data and load prep content
   useEffect(() => {
     const roleData = roleContent[role as keyof typeof roleContent];
     if (roleData && roleData.speech && roleData.speech.templateSections) {
@@ -66,6 +66,47 @@ export const useSpeechContent = (role: string) => {
           content: []
         }));
         setSections(initialSections);
+        
+        // Load framing content from prep stage if available
+        if (savedNotes && savedNotes.prep) {
+          const prepNotes = savedNotes.prep;
+          const framingContent: Content[] = [];
+          
+          // Add problem to framing if it exists and is not empty
+          if (prepNotes.problem && prepNotes.problem.trim()) {
+            framingContent.push({
+              id: `framing-problem-${Date.now()}`,
+              content: `**הבעיה/מצב נוכחי:**\n${prepNotes.problem}`,
+              type: 'framing'
+            });
+          }
+          
+          // Add mechanism to framing if it exists and is not empty
+          if (prepNotes.mechanism && prepNotes.mechanism.trim()) {
+            framingContent.push({
+              id: `framing-mechanism-${Date.now()}`,
+              content: `**המנגנון/פתרון:**\n${prepNotes.mechanism}`,
+              type: 'framing'
+            });
+          }
+          
+          // Add general framing if it exists and is not empty
+          if (prepNotes.framing && prepNotes.framing.trim()) {
+            framingContent.push({
+              id: `framing-general-${Date.now()}`,
+              content: `**פריימינג כללי:**\n${prepNotes.framing}`,
+              type: 'framing'
+            });
+          }
+          
+          // Update content state with framing content
+          if (framingContent.length > 0) {
+            setContent(prev => ({
+              ...prev,
+              framing: framingContent
+            }));
+          }
+        }
       }
     }
   }, [role]);

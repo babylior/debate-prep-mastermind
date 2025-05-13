@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { getNotes, saveNotes } from "@/utils/localStorage";
@@ -15,7 +14,8 @@ export interface Argument {
 export const usePrepStageState = (role: string, motion: string) => {
   const { toast } = useToast();
   
-  const [activeTab, setActiveTab] = useState<string>('idea-dump');
+  // Changed default tab to 'argument-builder' instead of 'idea-dump'
+  const [activeTab, setActiveTab] = useState<string>('argument-builder');
   const [isTipsPanelOpen, setIsTipsPanelOpen] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   
@@ -63,30 +63,6 @@ export const usePrepStageState = (role: string, motion: string) => {
       }
     }
   }, [role]);
-
-  const handleNoteChange = (key: string, value: string) => {
-    setSaveStatus('saving');
-    const updatedNotes = {
-      ...notes,
-      [key]: value
-    };
-    setNotes(updatedNotes);
-    
-    // Save to localStorage
-    const savedNotes = getNotes() || {
-      motion,
-      role,
-      prep: {},
-      listening: {},
-      speech: {},
-      lastUpdated: Date.now()
-    };
-    
-    savedNotes.prep = updatedNotes;
-    saveNotes(savedNotes);
-    setSaveStatus('saved');
-    setTimeout(() => setSaveStatus('idle'), 2000);
-  };
 
   const handleTimerComplete = () => {
     toast({

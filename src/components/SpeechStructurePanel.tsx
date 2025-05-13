@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
-import { Eye, Edit, ChevronRight } from "lucide-react";
+import { Eye, Edit, ChevronRight, Play, Pause } from "lucide-react";
 import MarkdownRenderer from './MarkdownRenderer';
 
 interface SpeechStructurePanelProps {
@@ -29,6 +29,8 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
   onDrop,
   showTimer = false
 }) => {
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  
   const handleDrop = (e: React.DragEvent, sectionIndex: number) => {
     e.preventDefault();
     const itemId = e.dataTransfer.getData('text/plain');
@@ -71,6 +73,10 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
       default:
         return '';
     }
+  };
+
+  const toggleTimer = () => {
+    setIsTimerRunning(!isTimerRunning);
   };
 
   return (
@@ -123,14 +129,25 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
       ) : (
         <div className="relative min-h-[60vh] flex flex-col bg-white rounded-lg shadow-sm border p-8">
           {showTimer && (
-            <div className="sticky top-4 right-4 flex justify-end mb-6">
+            <div className="sticky top-4 right-4 flex justify-between mb-6 w-full">
               <Timer 
                 initialTime={7 * 60}
                 timerLabel="זמן נאום"
                 onComplete={() => {}}
-                autoStart={false}
+                autoStart={isTimerRunning}
                 className="max-w-xs"
               />
+              <Button 
+                onClick={toggleTimer}
+                variant="outline"
+                className={`${isTimerRunning ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}
+              >
+                {isTimerRunning ? (
+                  <><Pause className="h-4 w-4 mr-2" /> עצור שעון</>
+                ) : (
+                  <><Play className="h-4 w-4 mr-2" /> התחל שעון</>
+                )}
+              </Button>
             </div>
           )}
           
@@ -139,7 +156,7 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
               section.content ? (
                 <div 
                   key={idx} 
-                  className={`mb-10 p-6 ${idx === currentSection ? 'bg-blue-50/50 rounded-xl border border-blue-100 animate-pulse' : ''}`}
+                  className={`mb-10 p-6 ${idx === currentSection ? 'bg-blue-50/50 rounded-xl border border-blue-100 shadow-md' : ''}`}
                 >
                   <h2 className={`text-2xl font-bold mb-5 ${getSectionTypeColor(section.type)}`}>
                     {section.title}

@@ -56,7 +56,7 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete, onMotio
               initialTime={15 * 60} // 15 minutes in seconds
               timerLabel="זמן הכנה"
               onComplete={handleTimerComplete}
-              autoStart={false}
+              autoStart={true} // Start timer automatically
             />
           </div>
         </div>
