@@ -1,16 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { getNotes, saveNotes } from "@/utils/localStorage";
+import { Argument } from '@/types/prepTypes';
+import { useNotesManager } from './prep/useNotesManager';
+import { useArgumentsManager } from './prep/useArgumentsManager';
+import { useDragDrop } from './prep/useDragDrop';
 
-export interface Argument {
-  id: string;
-  claim: string;
-  whyTrue: string;
-  mechanism: string;
-  impact: string;
-  weighing: string;
-}
+export type { Argument };
 
 export const usePrepStageState = (role: string, motion: string) => {
   const { toast } = useToast();
@@ -18,18 +15,30 @@ export const usePrepStageState = (role: string, motion: string) => {
   // Changed default tab to 'argument-builder' instead of 'idea-dump'
   const [activeTab, setActiveTab] = useState<string>('argument-builder');
   const [isTipsPanelOpen, setIsTipsPanelOpen] = useState<boolean>(false);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   
-  const [notes, setNotes] = useState<Record<string, string>>({
-    'problem': '',
-    'mechanism': '',
-    'framing': '',
-    'ideaDump': '',
-    'notes': ''
-  });
+  // Use the extracted hooks
+  const { 
+    notes, 
+    setNotes, 
+    saveStatus, 
+    handleNoteChange 
+  } = useNotesManager(role, motion);
   
-  const [prepArguments, setPrepArguments] = useState<Argument[]>([]);
-  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const {
+    prepArguments,
+    setPrepArguments,
+    addArgument,
+    deleteArgument,
+    duplicateArgument,
+    updateArgument
+  } = useArgumentsManager(role, motion);
+  
+  const {
+    draggedItemIndex,
+    handleDragStart,
+    handleDragEnd,
+    handleDragOver
+  } = useDragDrop(prepArguments, setPrepArguments);
 
   // Initialize notes from localStorage
   useEffect(() => {
@@ -65,162 +74,11 @@ export const usePrepStageState = (role: string, motion: string) => {
     }
   }, [role]);
 
-  // Add the missing handleNoteChange function
-  const handleNoteChange = (key: string, value: string) => {
-    setSaveStatus('saving');
-    
-    // Update the notes state
-    setNotes(prev => ({
-      ...prev,
-      [key]: value
-    }));
-    
-    // Save to localStorage
-    const savedNotes = getNotes() || {
-      motion,
-      role,
-      prep: {},
-      listening: {},
-      speech: {},
-      lastUpdated: Date.now()
-    };
-    
-    if (!savedNotes.prep) {
-      savedNotes.prep = {};
-    }
-    
-    savedNotes.prep[key] = value;
-    saveNotes(savedNotes);
-    
-    setSaveStatus('saved');
-    setTimeout(() => setSaveStatus('idle'), 2000);
-  };
-
   const handleTimerComplete = () => {
     toast({
       title: "הזמן נגמר!",
       description: "זמן ההכנה של 15 דקות הסתיים.",
     });
-  };
-  
-  // Argument functions
-  const addArgument = () => {
-    const newArg: Argument = {
-      id: Date.now().toString(),
-      claim: '',
-      whyTrue: '',
-      mechanism: '',
-      impact: '',
-      weighing: ''
-    };
-    
-    const updatedArgs = [...prepArguments, newArg];
-    setPrepArguments(updatedArgs);
-    
-    // Save to localStorage
-    const savedNotes = getNotes() || {
-      motion,
-      role,
-      prep: {},
-      listening: {},
-      speech: {},
-      lastUpdated: Date.now()
-    };
-    
-    savedNotes.prepArguments = updatedArgs;
-    saveNotes(savedNotes);
-    
-    // Show feedback
-    toast({
-      title: "טיעון נוסף",
-      description: "כרטיס טיעון חדש נוסף.",
-    });
-  };
-  
-  const deleteArgument = (id: string) => {
-    const updatedArgs = prepArguments.filter(arg => arg.id !== id);
-    setPrepArguments(updatedArgs);
-    
-    // Save to localStorage
-    const savedNotes = getNotes();
-    if (savedNotes) {
-      savedNotes.prepArguments = updatedArgs;
-      saveNotes(savedNotes);
-    }
-  };
-  
-  const duplicateArgument = (id: string) => {
-    const argToDuplicate = prepArguments.find(arg => arg.id === id);
-    if (argToDuplicate) {
-      const newArg = {
-        ...argToDuplicate,
-        id: Date.now().toString()
-      };
-      
-      const updatedArgs = [...prepArguments, newArg];
-      setPrepArguments(updatedArgs);
-      
-      // Save to localStorage
-      const savedNotes = getNotes();
-      if (savedNotes) {
-        savedNotes.prepArguments = updatedArgs;
-        saveNotes(savedNotes);
-      }
-    }
-  };
-  
-  const updateArgument = (
-    id: string, 
-    field: "claim" | "whyTrue" | "mechanism" | "impact" | "weighing", 
-    value: string
-  ) => {
-    setSaveStatus('saving');
-    const updatedArgs = prepArguments.map(arg =>
-      arg.id === id ? { ...arg, [field]: value } : arg
-    );
-    
-    setPrepArguments(updatedArgs);
-    
-    // Save to localStorage
-    const savedNotes = getNotes();
-    if (savedNotes) {
-      savedNotes.prepArguments = updatedArgs;
-      saveNotes(savedNotes);
-      setSaveStatus('saved');
-      setTimeout(() => setSaveStatus('idle'), 2000);
-    }
-  };
-  
-  // Drag and drop handlers
-  const handleDragStart = (index: number) => {
-    setDraggedItemIndex(index);
-  };
-  
-  const handleDragEnd = () => {
-    setDraggedItemIndex(null);
-  };
-  
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (draggedItemIndex === null || draggedItemIndex === index) return;
-    
-    const newArguments = [...prepArguments];
-    const draggedItem = newArguments[draggedItemIndex];
-    
-    // Remove the dragged item
-    newArguments.splice(draggedItemIndex, 1);
-    // Insert it at the new position
-    newArguments.splice(index, 0, draggedItem);
-    
-    setDraggedItemIndex(index);
-    setPrepArguments(newArguments);
-    
-    // Save the new order to localStorage
-    const savedNotes = getNotes();
-    if (savedNotes) {
-      savedNotes.prepArguments = newArguments;
-      saveNotes(savedNotes);
-    }
   };
 
   return {
