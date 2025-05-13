@@ -2,13 +2,13 @@
 import React from 'react';
 import IdeaDumpTab from './IdeaDumpTab';
 import ArgumentBuilderTab from './ArgumentBuilderTab';
-import { Argument } from '@/hooks/usePrepStageState';
+import { Argument, PrepNotes } from '@/types/prepTypes';
 
 interface PrepTabContentProps {
   activeTab: string;
-  notes: Record<string, string>;
+  notes: PrepNotes;
   args: Argument[];
-  onNotesChange: (key: string, value: string) => void;
+  onNotesChange: (key: keyof PrepNotes, value: string) => void;
   onAddArgument: () => void;
   onDeleteArgument: (id: string) => void;
   onDuplicateArgument: (id: string) => void;

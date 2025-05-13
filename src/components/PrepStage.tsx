@@ -9,6 +9,7 @@ import PrepTabs from './PrepTabs';
 import PrepStageHeader from './prep/PrepStageHeader';
 import PrepTabContent from './prep/PrepTabContent';
 import { usePrepStageState } from '@/hooks/usePrepStageState';
+import { PrepNotes } from '@/types/prepTypes';
 
 interface PrepStageProps {
   role: string;
