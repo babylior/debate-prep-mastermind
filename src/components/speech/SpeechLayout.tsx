@@ -95,7 +95,7 @@ const SpeechLayout: React.FC<SpeechLayoutProps> = ({
           onModeToggle={onModeToggle}
           onNextSection={onNextSection}
           onDrop={onDrop}
-          showTimer={true} // Enable 7-minute timer
+          showTimer={!isEditMode} // Only show timer in presentation mode
         />
       </div>
       

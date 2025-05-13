@@ -3,19 +3,22 @@ import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getNotes } from '@/utils/localStorage';
 import { DebateRole } from '@/utils/debateData';
+import EditableMotion from './EditableMotion';
 
 interface NavigationBarProps {
   activeStage: string;
   onStageChange: (stage: string) => void;
   role: DebateRole;
   motion: string;
+  onMotionChange: (newMotion: string) => void;
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ 
   activeStage, 
   onStageChange, 
   role,
-  motion 
+  motion,
+  onMotionChange 
 }) => {
   // Check if we have content in each stage
   const hasContent = () => {
@@ -68,9 +71,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         </Tabs>
         
         <div className="flex justify-center mt-3 mb-1">
-          <p className="text-sm font-medium bg-gray-50 px-4 py-1.5 rounded-full border text-gray-700">
-            {motion} <span className="text-gray-500 mx-1.5">•</span> <span className="font-semibold">{role}</span>
-          </p>
+          <div className="text-sm font-medium bg-gray-50 px-4 py-1.5 rounded-full border text-gray-700 flex items-center">
+            <EditableMotion 
+              motion={motion} 
+              onMotionChange={onMotionChange} 
+            />
+            <span className="text-gray-500 mx-1.5">•</span>
+            <span className="font-semibold">{role}</span>
+          </div>
         </div>
       </div>
     </div>

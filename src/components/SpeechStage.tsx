@@ -10,9 +10,10 @@ interface SpeechStageProps {
   role: string;
   motion: string;
   onReset: () => void;
+  onMotionChange: (newMotion: string) => void;
 }
 
-const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
+const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset, onMotionChange }) => {
   const roleData = roleContent[role as DebateRole];
   
   const [isEditMode, setIsEditMode] = useState(true);
@@ -46,6 +47,7 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
         sections={sections}
         onTipsOpen={() => setIsTipsPanelOpen(true)}
         onReset={onReset}
+        onMotionChange={onMotionChange}
       />
 
       <SpeechLayout

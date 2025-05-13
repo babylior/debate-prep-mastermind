@@ -6,6 +6,7 @@ import ReviewLocations from "../ReviewLocations";
 import { DebateRole, debateRoles } from "@/utils/debateData";
 import { Section } from '@/hooks/useSpeechContent';
 import ExportButtonWrapper from "./ExportButtonWrapper";
+import EditableMotion from '../EditableMotion';
 
 interface SpeechHeaderProps {
   role: string;
@@ -14,6 +15,7 @@ interface SpeechHeaderProps {
   sections: Section[];
   onTipsOpen: () => void;
   onReset: () => void;
+  onMotionChange: (newMotion: string) => void;
 }
 
 const SpeechHeader: React.FC<SpeechHeaderProps> = ({ 
@@ -22,7 +24,8 @@ const SpeechHeader: React.FC<SpeechHeaderProps> = ({
   roleTitle, 
   sections,
   onTipsOpen, 
-  onReset 
+  onReset,
+  onMotionChange
 }) => {
   const currentRole = debateRoles.find(r => r.id === role);
   
@@ -31,7 +34,11 @@ const SpeechHeader: React.FC<SpeechHeaderProps> = ({
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{roleTitle}</h1>
-          <p className="text-gray-600 mt-1">{motion}</p>
+          <EditableMotion 
+            motion={motion} 
+            onMotionChange={onMotionChange} 
+            className="mt-1"
+          />
         </div>
         <div className="flex space-x-3">
           <Button 

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole, debateRoles } from "@/utils/debateData";
@@ -9,17 +9,18 @@ import { useToast } from "@/components/ui/use-toast";
 import { StatusBar } from "@/components/ui/status-bar";
 import { Lightbulb } from "lucide-react";
 import TipsPanel from './TipsPanel';
+import EditableMotion from './EditableMotion';
 
 interface ListeningStageProps {
   role: string;
   motion: string;
   onComplete: () => void;
+  onMotionChange: (newMotion: string) => void;
 }
 
-const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplete }) => {
+const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplete, onMotionChange }) => {
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
-  const currentRole = debateRoles.find(r => r.id === role);
   
   const [teamNotes, setTeamNotes] = useState({
     og: '',
@@ -102,7 +103,11 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{roleData.listening.title}</h1>
-          <p className="text-gray-600 mt-1">{motion}</p>
+          <EditableMotion 
+            motion={motion} 
+            onMotionChange={onMotionChange} 
+            className="mt-1"
+          />
         </div>
         
         <div className="flex gap-2">
@@ -112,7 +117,7 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
             className="flex items-center gap-2"
           >
             <Lightbulb className="h-4 w-4" />
-            <span className="hidden sm:inline">Tips & Resources</span>
+            <span className="hidden sm:inline">טיפים ומקורות</span>
           </Button>
         </div>
       </div>
@@ -120,14 +125,8 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
       <div className="mb-6">
         <Card className="p-4 mb-4">
           <p className="text-gray-700 text-sm mb-2">
-            עכשיו אפשר לסמן טקסט ולהפוך אותו לטקסט מודגש, נטוי או מסומן בכל הטפסים.
-            השתמש בכפתורים כדי להוסיף עיצוב לטקסט שבחרת.
+            רשום הערות על כל קבוצה בזמן שאתה מקשיב לנאומים האחרים.
           </p>
-          <div className="flex gap-2 text-sm">
-            <span className="font-bold">**טקסט מודגש**</span>
-            <span className="italic">*טקסט נטוי*</span>
-            <span className="bg-yellow-200 px-1 rounded-sm">===טקסט מסומן===</span>
-          </div>
         </Card>
         <TeamNotesGrid 
           notes={teamNotes} 
@@ -146,7 +145,7 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
         role={role as DebateRole} 
         content={{
           instructions: roleData.listening.instructions,
-          questions: roleData.listening.questions || [], // Ensure questions is provided
+          questions: roleData.listening.questions || [],
           tips: roleData.listening.tips
         }}
         isOpen={isTipsPanelOpen}

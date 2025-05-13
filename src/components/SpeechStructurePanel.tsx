@@ -59,24 +59,24 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
   return (
     <div className="relative">
       <div className="flex justify-between mb-4 gap-2 items-center">
-        <div>
-          {showTimer && (
-            <Timer 
-              initialTime={7 * 60} // 7 minutes
-              timerLabel="זמן נאום"
-              onComplete={() => {}}
-              autoStart={false}
-            />
-          )}
+        {isEditMode && (
+          <Timer 
+            initialTime={7 * 60} // 7 minutes
+            timerLabel="זמן נאום"
+            autoStart={false}
+            className="max-w-xs"
+          />
+        )}
+        <div className={isEditMode ? "" : "ms-auto"}>
+          <Button 
+            variant="outline" 
+            onClick={onModeToggle}
+            className="flex items-center gap-2"
+          >
+            {isEditMode ? <Eye className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+            {isEditMode ? 'מצב הצגה' : 'מצב עריכה'}
+          </Button>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={onModeToggle}
-          className="flex items-center gap-2"
-        >
-          {isEditMode ? <Eye className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-          {isEditMode ? 'מצב הצגה' : 'מצב עריכה'}
-        </Button>
       </div>
 
       {isEditMode ? (
@@ -84,7 +84,7 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
           {sections.map((section, index) => (
             <Card 
               key={index}
-              className={`border-2 transition-all ${!section.content ? 'border-dashed border-gray-300 hover:border-gray-400' : 'border-transparent shadow-md'} ${getTypeStyles(section.type)}`}
+              className={`border ${!section.content ? 'border-dashed border-gray-300 hover:border-gray-400' : 'shadow-sm'} ${getTypeStyles(section.type)}`}
               onDrop={(e) => handleDrop(e, index)}
               onDragOver={handleDragOver}
             >
@@ -104,12 +104,13 @@ const SpeechStructurePanel: React.FC<SpeechStructurePanelProps> = ({
       ) : (
         <div className="relative min-h-[60vh] flex flex-col bg-white rounded-lg shadow-sm border p-6">
           {showTimer && (
-            <div className="sticky top-4 right-4 flex justify-end mb-4">
+            <div className="sticky top-4 right-4 flex justify-end mb-6">
               <Timer 
                 initialTime={7 * 60}
                 timerLabel="זמן נאום"
                 onComplete={() => {}}
                 autoStart={false}
+                className="max-w-xs"
               />
             </div>
           )}

@@ -43,14 +43,15 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onComplete }) => {
       return;
     }
     
-    // Use empty string for motion if none is provided
-    saveMotion(motion);
+    // Use default motion if none is provided
+    const defaultMotion = motion.trim() || "This house...";
+    saveMotion(defaultMotion);
     saveRole(selectedRole);
-    onComplete(selectedRole, motion);
+    onComplete(selectedRole, defaultMotion);
     
     toast({
       title: "Prep started",
-      description: "Your 15-minute preparation timer has started."
+      description: "Your preparation has started."
     });
   };
   

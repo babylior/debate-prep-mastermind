@@ -14,16 +14,16 @@ const Index = () => {
     const savedRole = getRole();
     const savedMotion = getMotion();
     
-    if (savedRole && savedMotion) {
+    if (savedRole) {
       setSelectedRole(savedRole);
-      setMotion(savedMotion);
+      setMotion(savedMotion || 'This house...');
       setStage('debate');
     }
   }, []);
   
   const handleRoleSelection = (role: string, motion: string) => {
     setSelectedRole(role);
-    setMotion(motion);
+    setMotion(motion || 'This house...');
     setStage('debate');
   };
   

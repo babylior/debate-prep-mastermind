@@ -14,9 +14,10 @@ interface PrepStageProps {
   role: string;
   motion: string;
   onComplete: () => void;
+  onMotionChange: (newMotion: string) => void;
 }
 
-const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
+const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete, onMotionChange }) => {
   const roleData = roleContent[role as DebateRole];
   
   const {
@@ -43,13 +44,14 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
       <PrepStageHeader 
         role={role} 
         motion={motion} 
-        onOpenTipsPanel={() => setIsTipsPanelOpen(true)} 
+        onOpenTipsPanel={() => setIsTipsPanelOpen(true)}
+        onMotionChange={onMotionChange}
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left Column - Timer */}
         <div className="lg:col-span-1 order-2 lg:order-1">
-          <div className="sticky top-4">
+          <div className="sticky top-24">
             <Timer 
               initialTime={15 * 60} // 15 minutes in seconds
               timerLabel="זמן הכנה"
