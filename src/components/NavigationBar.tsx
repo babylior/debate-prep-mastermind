@@ -34,50 +34,50 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
 
   return (
     <div className="sticky top-16 z-10 bg-white border-b shadow-sm mb-6">
-      <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6">
         <Tabs value={activeStage} onValueChange={onStageChange} className="w-full">
-          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto bg-gray-100 p-1">
+          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto bg-gray-100/70 p-1 rounded-xl">
             <TabsTrigger 
               value="prep" 
-              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
+              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm rounded-lg px-4 py-2 font-medium"
               data-active={content.prep}
             >
               הכנה
               {content.prep && (
-                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white animate-pulse"></span>
               )}
             </TabsTrigger>
             <TabsTrigger 
               value="listening" 
-              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
+              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm rounded-lg px-4 py-2 font-medium"
               data-active={content.listening}
             >
               הקשבה
               {content.listening && (
-                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white animate-pulse"></span>
               )}
             </TabsTrigger>
             <TabsTrigger 
               value="speech" 
-              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
+              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm rounded-lg px-4 py-2 font-medium"
               data-active={content.speech}
             >
               נאום
               {content.speech && (
-                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white animate-pulse"></span>
               )}
             </TabsTrigger>
           </TabsList>
         </Tabs>
         
         <div className="flex justify-center mt-3 mb-1">
-          <div className="text-sm font-medium bg-gray-50 px-4 py-1.5 rounded-full border text-gray-700 flex items-center">
+          <div className="text-sm font-medium bg-white px-4 py-1.5 rounded-full border shadow-sm text-gray-700 flex items-center">
             <EditableMotion 
               motion={motion} 
               onMotionChange={onMotionChange} 
             />
-            <span className="text-gray-500 mx-1.5">•</span>
-            <span className="font-semibold">{role}</span>
+            <span className="text-gray-400 mx-2">•</span>
+            <span className="font-semibold text-gray-800">{role}</span>
           </div>
         </div>
       </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PrepStage from './PrepStage';
@@ -61,8 +62,8 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initi
   return (
     <div className="w-full">
       {/* Team and motion info at the top */}
-      <div className="hidden lg:flex items-center mb-6 bg-white p-4 rounded-lg shadow-sm border">
-        <div className={`${teamColor} w-14 h-14 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-md`}>
+      <div className="hidden lg:flex items-center mb-6 bg-white p-5 rounded-lg shadow-sm border">
+        <div className={`${teamColor} w-16 h-16 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-md`}>
           {currentRole?.name || ''}
         </div>
         <div className="flex flex-col">

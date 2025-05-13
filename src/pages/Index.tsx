@@ -28,7 +28,7 @@ const Index = () => {
   };
   
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset your debate session? All notes will be cleared.')) {
+    if (window.confirm('האם אתה בטוח שברצונך לאפס את הדיון שלך? כל ההערות ימחקו.')) {
       clearNotes();
       setStage('selection');
       setSelectedRole('');
@@ -44,15 +44,15 @@ const Index = () => {
           {stage === 'debate' && (
             <button 
               onClick={handleReset} 
-              className="text-sm bg-white hover:bg-gray-100 text-gray-600 px-3 py-1.5 rounded-md border transition-colors"
+              className="text-sm bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md border transition-colors shadow-sm font-medium"
             >
-              Switch Role
+              החלף תפקיד
             </button>
           )}
         </div>
       </header>
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {stage === 'selection' ? (
           <RoleSelection onComplete={handleRoleSelection} />
         ) : (

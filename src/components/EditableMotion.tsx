@@ -24,6 +24,9 @@ const EditableMotion: React.FC<EditableMotionProps> = ({
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
+      // Position cursor at the end of text
+      const length = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(length, length);
     }
   }, [isEditing]);
 
@@ -32,13 +35,9 @@ const EditableMotion: React.FC<EditableMotionProps> = ({
   }, [motion]);
 
   const handleSave = () => {
-    if (editedMotion.trim() === '') {
-      setEditedMotion('This house...');
-      onMotionChange('This house...');
-    } else {
-      onMotionChange(editedMotion);
-    }
-    saveMotion(editedMotion || 'This house...');
+    const finalMotion = editedMotion.trim() === '' ? 'This house...' : editedMotion;
+    onMotionChange(finalMotion);
+    saveMotion(finalMotion);
     setIsEditing(false);
     
     toast({
@@ -65,14 +64,14 @@ const EditableMotion: React.FC<EditableMotionProps> = ({
           value={editedMotion}
           onChange={(e) => setEditedMotion(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="border-b bg-transparent px-1 py-0.5 text-gray-600 focus:border-blue-500 focus:outline-none"
+          className="border-b-2 border-blue-400 bg-transparent px-2 py-0.5 text-gray-700 focus:border-blue-600 focus:outline-none transition-colors w-full"
           placeholder="This house believes that..."
         />
         <Button 
           onClick={handleSave} 
           size="sm" 
           variant="ghost" 
-          className="ml-1"
+          className="ml-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors"
         >
           <Check className="h-4 w-4" />
         </Button>
@@ -82,12 +81,12 @@ const EditableMotion: React.FC<EditableMotionProps> = ({
 
   return (
     <div className={`flex items-center group ${className}`}>
-      <p className="text-gray-600">{motion || "This house..."}</p>
+      <p className="text-gray-700 font-medium">{motion || "This house..."}</p>
       <Button 
         onClick={() => setIsEditing(true)} 
         size="sm" 
         variant="ghost" 
-        className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-blue-600 hover:bg-blue-50"
       >
         <Edit className="h-3.5 w-3.5" />
       </Button>
