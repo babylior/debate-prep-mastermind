@@ -51,13 +51,13 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
   return (
     <div className="w-full">
       {/* Team and motion info at the top */}
-      <div className="hidden lg:flex items-center mb-6">
-        <div className={`${teamColor} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3`}>
+      <div className="hidden lg:flex items-center mb-6 bg-white p-4 rounded-lg shadow-sm border">
+        <div className={`${teamColor} w-14 h-14 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-md`}>
           {currentRole?.name || ''}
         </div>
         <div>
-          <h1 className="text-2xl font-bold">{currentRole?.fullName}</h1>
-          <p className="text-gray-600">{motion}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{currentRole?.fullName}</h1>
+          <p className="text-gray-600 mt-1">{motion}</p>
         </div>
       </div>
       
@@ -70,7 +70,7 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
       />
       
       <Tabs value={activeStage} onValueChange={handleStageChange} className="w-full">
-        <TabsContent value="prep" className="m-0 mt-0">
+        <TabsContent value="prep" className="m-0 mt-0 animate-fade-in">
           <PrepStage 
             role={role} 
             motion={motion} 
@@ -78,7 +78,7 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
           />
         </TabsContent>
         
-        <TabsContent value="listening" className="m-0 mt-0">
+        <TabsContent value="listening" className="m-0 mt-0 animate-fade-in">
           <ListeningStage 
             role={role} 
             motion={motion} 
@@ -86,7 +86,7 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onRes
           />
         </TabsContent>
         
-        <TabsContent value="speech" className="m-0 mt-0">
+        <TabsContent value="speech" className="m-0 mt-0 animate-fade-in">
           <SpeechStage 
             role={role} 
             motion={motion} 

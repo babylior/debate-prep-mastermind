@@ -30,46 +30,46 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const content = hasContent();
 
   return (
-    <div className="sticky top-0 z-10 bg-white border-b shadow-sm mb-6">
-      <div className="max-w-7xl mx-auto px-4 py-2 sm:px-6">
+    <div className="sticky top-16 z-10 bg-white border-b shadow-sm mb-6">
+      <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6">
         <Tabs value={activeStage} onValueChange={onStageChange} className="w-full">
-          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
+          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto bg-gray-100 p-1">
             <TabsTrigger 
               value="prep" 
-              className="relative"
+              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
               data-active={content.prep}
             >
-              Prep
+              הכנה
               {content.prep && (
-                <span className="absolute top-0 right-1 h-2 w-2 rounded-full bg-green-500"></span>
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
               )}
             </TabsTrigger>
             <TabsTrigger 
               value="listening" 
-              className="relative"
+              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
               data-active={content.listening}
             >
-              Listening
+              הקשבה
               {content.listening && (
-                <span className="absolute top-0 right-1 h-2 w-2 rounded-full bg-green-500"></span>
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
               )}
             </TabsTrigger>
             <TabsTrigger 
               value="speech" 
-              className="relative"
+              className="relative transition-all data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
               data-active={content.speech}
             >
-              Speech
+              נאום
               {content.speech && (
-                <span className="absolute top-0 right-1 h-2 w-2 rounded-full bg-green-500"></span>
+                <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"></span>
               )}
             </TabsTrigger>
           </TabsList>
         </Tabs>
         
-        <div className="flex items-center justify-center mt-2">
-          <p className="text-sm text-gray-500 italic">
-            {motion} ({role})
+        <div className="flex justify-center mt-3 mb-1">
+          <p className="text-sm font-medium bg-gray-50 px-4 py-1.5 rounded-full border text-gray-700">
+            {motion} <span className="text-gray-500 mx-1.5">•</span> <span className="font-semibold">{role}</span>
           </p>
         </div>
       </div>

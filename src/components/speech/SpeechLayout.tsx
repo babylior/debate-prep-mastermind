@@ -100,15 +100,15 @@ const SpeechLayout: React.FC<SpeechLayoutProps> = ({
       </div>
       
       {isEditMode && (
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Content</CardTitle>
+        <div className="lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
+          <Card className="border shadow-sm">
+            <CardHeader className="pb-2 border-b bg-gray-50">
+              <CardTitle>תוכן</CardTitle>
               <CardDescription>
-                Drag items into your speech structure
+                גרור פריטים למבנה הנאום שלך
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 bg-white">
               <ContentPanel
                 argumentsList={transformedContent.argumentsList}
                 rebuttals={transformedContent.rebuttals}
