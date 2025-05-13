@@ -8,10 +8,10 @@ interface TimerProps {
   timerLabel: string;
   onComplete?: () => void;
   autoStart?: boolean;
-  className?: string; // Add this line to accept className
+  className?: string;
 }
 
-const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, autoStart = false, className }) => {
+const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, autoStart = true, className }) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(autoStart);
 
