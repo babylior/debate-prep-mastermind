@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { getNotes, saveNotes } from "@/utils/localStorage";
@@ -63,6 +64,37 @@ export const usePrepStageState = (role: string, motion: string) => {
       }
     }
   }, [role]);
+
+  // Add the missing handleNoteChange function
+  const handleNoteChange = (key: string, value: string) => {
+    setSaveStatus('saving');
+    
+    // Update the notes state
+    setNotes(prev => ({
+      ...prev,
+      [key]: value
+    }));
+    
+    // Save to localStorage
+    const savedNotes = getNotes() || {
+      motion,
+      role,
+      prep: {},
+      listening: {},
+      speech: {},
+      lastUpdated: Date.now()
+    };
+    
+    if (!savedNotes.prep) {
+      savedNotes.prep = {};
+    }
+    
+    savedNotes.prep[key] = value;
+    saveNotes(savedNotes);
+    
+    setSaveStatus('saved');
+    setTimeout(() => setSaveStatus('idle'), 2000);
+  };
 
   const handleTimerComplete = () => {
     toast({
