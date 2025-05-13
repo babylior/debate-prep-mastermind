@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PrepStage from './PrepStage';
@@ -7,6 +6,7 @@ import SpeechStage from './SpeechStage';
 import { debateRoles, DebateRole } from '@/utils/debateData';
 import { getNotes, getMotion, saveMotion } from '@/utils/localStorage';
 import NavigationBar from './NavigationBar';
+import EditableMotion from './EditableMotion';
 
 interface DebateStagesProps {
   selectedRole: string;
