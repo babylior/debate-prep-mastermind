@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { getNotes, saveNotes } from "@/utils/localStorage";
 
 interface TeamNotesGridProps {
-  role: string; // Add this property
+  role: string;
   onChange?: (team: keyof TeamNotes, value: string) => void;
 }
 
@@ -36,7 +36,7 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ role, onChange }) => {
   useEffect(() => {
     // Load notes from localStorage
     const savedNotes = getNotes();
-    if (savedNotes?.teamNotes) {
+    if (savedNotes && savedNotes.teamNotes) {
       setNotes(savedNotes.teamNotes);
     }
   }, []);
@@ -46,7 +46,20 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ role, onChange }) => {
     setNotes(updatedNotes);
     
     // Save to localStorage
-    const savedNotes = getNotes() || {};
+    const savedNotes = getNotes() || {
+      motion: '',
+      role: role,
+      prep: {},
+      listening: {},
+      speech: {},
+      lastUpdated: Date.now(),
+      teamNotes: {}
+    };
+    
+    if (!savedNotes.teamNotes) {
+      savedNotes.teamNotes = {};
+    }
+    
     savedNotes.teamNotes = updatedNotes;
     saveNotes(savedNotes);
     

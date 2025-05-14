@@ -1,3 +1,4 @@
+
 // Types for storing debate notes
 export interface DebateNotes {
   motion: string;
@@ -44,7 +45,7 @@ export interface DebateNotes {
     cgComparison?: string;
     coComparison?: string;
   };
-  interactivePrompts?: Array<{id: string, question: string, answer: string, rebuttal: string}>;
+  interactivePrompts?: Record<string, string>;
 }
 
 // Get notes from local storage

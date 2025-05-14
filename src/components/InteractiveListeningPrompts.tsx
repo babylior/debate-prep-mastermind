@@ -12,8 +12,8 @@ interface InteractivePrompt {
 }
 
 interface InteractiveListeningPromptsProps {
-  role: string; // Add this property
-  motion: string; // Add this property
+  role: string;
+  motion: string;
 }
 
 const InteractiveListeningPrompts: React.FC<InteractiveListeningPromptsProps> = ({
@@ -35,15 +35,17 @@ const InteractiveListeningPrompts: React.FC<InteractiveListeningPromptsProps> = 
     
     // Load any saved answers from localStorage
     const savedNotes = getNotes();
-    if (savedNotes?.interactivePrompts) {
+    if (savedNotes && savedNotes.interactivePrompts) {
       const savedPrompts = savedNotes.interactivePrompts;
       
-      // Merge saved answers with current prompts
-      newPrompts.forEach(prompt => {
-        if (savedPrompts[prompt.id]) {
-          prompt.answer = savedPrompts[prompt.id];
-        }
-      });
+      // If savedPrompts is an object with keys matching our prompt IDs
+      if (typeof savedPrompts === 'object' && savedPrompts !== null) {
+        newPrompts.forEach(prompt => {
+          if (savedPrompts[prompt.id]) {
+            prompt.answer = savedPrompts[prompt.id];
+          }
+        });
+      }
     }
     
     setPrompts(newPrompts);
@@ -57,11 +59,21 @@ const InteractiveListeningPrompts: React.FC<InteractiveListeningPromptsProps> = 
     setPrompts(updatedPrompts);
     
     // Save to localStorage
-    const savedNotes = getNotes() || {};
-    const promptAnswers = savedNotes.interactivePrompts || {};
-    promptAnswers[id] = answer;
+    const savedNotes = getNotes() || {
+      motion,
+      role,
+      prep: {},
+      listening: {},
+      speech: {},
+      lastUpdated: Date.now(),
+      interactivePrompts: {}
+    };
     
-    savedNotes.interactivePrompts = promptAnswers;
+    if (!savedNotes.interactivePrompts) {
+      savedNotes.interactivePrompts = {};
+    }
+    
+    savedNotes.interactivePrompts[id] = answer;
     saveNotes(savedNotes);
   };
 
