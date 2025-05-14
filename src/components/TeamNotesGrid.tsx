@@ -25,13 +25,24 @@ interface TeamNotes {
     coComparison?: string;
 }
 
+// Helper function to create an empty TeamNotes object with all required fields
+const createEmptyTeamNotes = (): TeamNotes => ({
+  og: '',
+  oo: '',
+  cg: '',
+  co: '',
+  ogRebuttal: '',
+  ooRebuttal: '',
+  cgRebuttal: '',
+  coRebuttal: '',
+  ogComparison: '',
+  ooComparison: '',
+  cgComparison: '',
+  coComparison: '',
+});
+
 const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ role, onChange }) => {
-  const [notes, setNotes] = useState<TeamNotes>({
-    og: '',
-    oo: '',
-    cg: '',
-    co: '',
-  });
+  const [notes, setNotes] = useState<TeamNotes>(createEmptyTeamNotes());
 
   useEffect(() => {
     // Load notes from localStorage
@@ -53,11 +64,11 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ role, onChange }) => {
       listening: {},
       speech: {},
       lastUpdated: Date.now(),
-      teamNotes: {}
+      teamNotes: createEmptyTeamNotes()
     };
     
     if (!savedNotes.teamNotes) {
-      savedNotes.teamNotes = {};
+      savedNotes.teamNotes = createEmptyTeamNotes();
     }
     
     savedNotes.teamNotes = updatedNotes;
