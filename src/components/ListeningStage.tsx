@@ -1,15 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
 import { useToast } from "@/components/ui/use-toast";
-import { getNotes, saveNotes } from "@/utils/localStorage";
+import { getNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
 import TeamNotesGrid from "@/components/TeamNotesGrid";
-import InteractiveListeningPrompts from "@/components/InteractiveListeningPrompts";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InstructionPanel from './InstructionPanel';
 
 interface ListeningStageProps {
@@ -23,38 +20,13 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
   const roleData = roleContent[role as DebateRole];
   const debateTime = 7 * 60; // 7 minutes in seconds
   
-  const [activeTab, setActiveTab] = useState("notes");
-  const [keyPoints, setKeyPoints] = useState("");
   const [showInstructions, setShowInstructions] = useState(false);
   
   // Initialize from localStorage
   useEffect(() => {
     const savedNotes = getNotes();
-    if (savedNotes?.listening?.keyPoints) {
-      setKeyPoints(savedNotes.listening.keyPoints);
-    }
+    // Just loading notes for initialization
   }, []);
-  
-  const handleKeyPointsChange = (value: string) => {
-    setKeyPoints(value);
-    
-    // Save to localStorage
-    const savedNotes = getNotes() || {
-      motion,
-      role,
-      prep: {},
-      listening: {},
-      speech: {},
-      lastUpdated: Date.now()
-    };
-    
-    savedNotes.listening = {
-      ...savedNotes.listening,
-      keyPoints: value
-    };
-    
-    saveNotes(savedNotes);
-  };
   
   const handleComplete = () => {
     onComplete();
@@ -116,39 +88,12 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
           )}
         </div>
         
-        {/* Right Column */}
+        {/* Right Column - Now showing only TeamNotesGrid */}
         <div className="lg:col-span-2">
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="notes">Key Points</TabsTrigger>
-              <TabsTrigger value="teams">Team Notes</TabsTrigger>
-              <TabsTrigger value="interactive">Interactive</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="notes" className="mt-0">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Key Points</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Textarea
-                    value={keyPoints}
-                    onChange={(e) => handleKeyPointsChange(e.target.value)}
-                    placeholder="Note key points from the speeches..."
-                    className="min-h-[300px]"
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="teams" className="mt-0">
-              <TeamNotesGrid role={role} />
-            </TabsContent>
-            
-            <TabsContent value="interactive" className="mt-0">
-              <InteractiveListeningPrompts role={role} motion={motion} />
-            </TabsContent>
-          </Tabs>
+          <Card className="p-4">
+            <h2 className="text-xl font-semibold mb-4">Team Notes</h2>
+            <TeamNotesGrid role={role} />
+          </Card>
           
           <div className="mt-6 text-right">
             <Button onClick={handleComplete} size="lg">
