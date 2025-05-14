@@ -8,7 +8,7 @@ interface TimerProps {
   timerLabel: string;
   onComplete?: () => void;
   autoStart?: boolean;
-  className?: string;
+  className?: string; // Add this line to accept className
 }
 
 const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, autoStart = false, className }) => {
@@ -64,7 +64,7 @@ const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, auto
   };
 
   return (
-    <div className={`w-full bg-white rounded-lg shadow-sm border p-4 ${className || ''}`}>
+    <div className={`w-full bg-white rounded-lg shadow p-4 sticky top-24 ${className || ''}`}>
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium text-gray-700">{timerLabel}</h3>
         <span className={`text-xl font-bold ${timeLeft < 60 ? 'text-red-600 animate-pulse' : ''}`}>
@@ -72,9 +72,9 @@ const Timer: React.FC<TimerProps> = ({ initialTime, timerLabel, onComplete, auto
         </span>
       </div>
 
-      <div className="w-full bg-gray-200 h-2 rounded-full mb-4">
+      <div className="w-full bg-gray-200 h-3 rounded-full mb-4">
         <div
-          className={`h-2 rounded-full transition-all ${getColorClass()}`}
+          className={`h-3 rounded-full transition-all ${getColorClass()}`}
           style={{ width: `${progressPercentage}%` }}
         ></div>
       </div>

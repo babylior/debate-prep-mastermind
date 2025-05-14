@@ -5,9 +5,8 @@ import PrepStage from './PrepStage';
 import ListeningStage from './ListeningStage';
 import SpeechStage from './SpeechStage';
 import { debateRoles, DebateRole } from '@/utils/debateData';
-import { getNotes, getMotion, saveMotion } from '@/utils/localStorage';
+import { getNotes, getMotion } from '@/utils/localStorage';
 import NavigationBar from './NavigationBar';
-import EditableMotion from './EditableMotion';
 
 interface DebateStagesProps {
   selectedRole: string;
@@ -15,10 +14,9 @@ interface DebateStagesProps {
   onReset: () => void;
 }
 
-const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initialMotion, onReset }) => {
+const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onReset }) => {
   const [activeStage, setActiveStage] = useState<string>('prep');
   const role = selectedRole as DebateRole;
-  const [motion, setMotion] = useState(initialMotion);
   
   const currentRole = debateRoles.find(r => r.id === role);
   const teamColor = currentRole?.teamColor || '';
@@ -28,19 +26,15 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initi
     const savedNotes = getNotes();
     const savedMotion = getMotion();
     
-    if (savedMotion) {
-      setMotion(savedMotion);
-    }
-    
-    // If we have saved notes, we may want to skip to a later stage
-    if (savedNotes) {
+    // If we have saved notes and they match the current motion, we may want to skip to a later stage
+    if (savedNotes && savedMotion === motion) {
       if (Object.keys(savedNotes.speech || {}).length > 0) {
         setActiveStage('speech');
       } else if (Object.keys(savedNotes.listening || {}).length > 0) {
         setActiveStage('listening');
       }
     }
-  }, []);
+  }, [motion]);
   
   const handleStageChange = (stage: string) => {
     setActiveStage(stage);
@@ -54,27 +48,16 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initi
     setActiveStage('speech');
   };
 
-  const handleMotionChange = (newMotion: string) => {
-    setMotion(newMotion);
-    saveMotion(newMotion);
-  };
-
   return (
     <div className="w-full">
       {/* Team and motion info at the top */}
-      <div className="hidden lg:flex items-center mb-6 bg-white p-5 rounded-lg shadow-sm border">
-        <div className={`${teamColor} w-16 h-16 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-md`}>
+      <div className="hidden lg:flex items-center mb-6">
+        <div className={`${teamColor} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mr-3`}>
           {currentRole?.name || ''}
         </div>
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900">{currentRole?.fullName}</h1>
-          <div className="mt-1">
-            <EditableMotion
-              motion={motion}
-              onMotionChange={handleMotionChange}
-              className="text-sm"
-            />
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold">{currentRole?.fullName}</h1>
+          <p className="text-gray-600">{motion}</p>
         </div>
       </div>
       
@@ -84,34 +67,30 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initi
         onStageChange={handleStageChange}
         role={role}
         motion={motion}
-        onMotionChange={handleMotionChange}
       />
       
       <Tabs value={activeStage} onValueChange={handleStageChange} className="w-full">
-        <TabsContent value="prep" className="m-0 mt-0 animate-fade-in">
+        <TabsContent value="prep" className="m-0 mt-0">
           <PrepStage 
             role={role} 
             motion={motion} 
-            onComplete={handlePrepComplete}
-            onMotionChange={handleMotionChange}
+            onComplete={handlePrepComplete} 
           />
         </TabsContent>
         
-        <TabsContent value="listening" className="m-0 mt-0 animate-fade-in">
+        <TabsContent value="listening" className="m-0 mt-0">
           <ListeningStage 
             role={role} 
             motion={motion} 
-            onComplete={handleListeningComplete}
-            onMotionChange={handleMotionChange}
+            onComplete={handleListeningComplete} 
           />
         </TabsContent>
         
-        <TabsContent value="speech" className="m-0 mt-0 animate-fade-in">
+        <TabsContent value="speech" className="m-0 mt-0">
           <SpeechStage 
             role={role} 
             motion={motion} 
-            onReset={onReset}
-            onMotionChange={handleMotionChange}
+            onReset={onReset} 
           />
         </TabsContent>
       </Tabs>

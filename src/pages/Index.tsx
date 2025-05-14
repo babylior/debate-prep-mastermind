@@ -14,21 +14,21 @@ const Index = () => {
     const savedRole = getRole();
     const savedMotion = getMotion();
     
-    if (savedRole) {
+    if (savedRole && savedMotion) {
       setSelectedRole(savedRole);
-      setMotion(savedMotion || 'This house...');
+      setMotion(savedMotion);
       setStage('debate');
     }
   }, []);
   
   const handleRoleSelection = (role: string, motion: string) => {
     setSelectedRole(role);
-    setMotion(motion || 'This house...');
+    setMotion(motion);
     setStage('debate');
   };
   
   const handleReset = () => {
-    if (window.confirm('האם אתה בטוח שברצונך לאפס את הדיון שלך? כל ההערות ימחקו.')) {
+    if (window.confirm('Are you sure you want to reset your debate session? All notes will be cleared.')) {
       clearNotes();
       setStage('selection');
       setSelectedRole('');
@@ -37,22 +37,22 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b sticky top-0 z-20">
+    <div className="min-h-screen bg-gray-50 pb-10">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">BP Debate Assistant</h1>
           {stage === 'debate' && (
             <button 
               onClick={handleReset} 
-              className="text-sm bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md border transition-colors shadow-sm font-medium"
+              className="text-sm text-gray-500 hover:text-gray-700"
             >
-              החלף תפקיד
+              Switch Role
             </button>
           )}
         </div>
       </header>
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {stage === 'selection' ? (
           <RoleSelection onComplete={handleRoleSelection} />
         ) : (
@@ -64,7 +64,7 @@ const Index = () => {
         )}
       </main>
       
-      <footer className="max-w-7xl mx-auto px-4 sm:px-6 py-6 text-center text-gray-500 text-sm border-t mt-10">
+      <footer className="max-w-7xl mx-auto px-4 sm:px-6 py-4 text-center text-gray-500 text-sm">
         BP Debate Assistant &copy; {new Date().getFullYear()}
       </footer>
     </div>
