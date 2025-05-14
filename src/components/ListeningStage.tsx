@@ -1,11 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getNotes, saveNotes } from "@/utils/localStorage";
-import { roleContent, DebateRole, debateRoles } from "@/utils/debateData";
-import TeamNotesGrid from './TeamNotesGrid';
+import Timer from "@/components/Timer";
 import { useToast } from "@/components/ui/use-toast";
+import { getNotes, saveNotes } from "@/utils/localStorage";
+import { roleContent, DebateRole } from "@/utils/debateData";
+import TeamNotesGrid from "@/components/TeamNotesGrid";
+import InteractiveListeningPrompts from "@/components/InteractiveListeningPrompts";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import InstructionPanel from './InstructionPanel';
 
 interface ListeningStageProps {
   role: string;
@@ -16,47 +21,23 @@ interface ListeningStageProps {
 const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplete }) => {
   const { toast } = useToast();
   const roleData = roleContent[role as DebateRole];
-  const currentRole = debateRoles.find(r => r.id === role);
-  const currentOrder = currentRole?.order || 1;
+  const debateTime = 7 * 60; // 7 minutes in seconds
   
-  const [teamNotes, setTeamNotes] = useState({
-    og: '',
-    oo: '',
-    cg: '',
-    co: ''
-  });
+  const [activeTab, setActiveTab] = useState("notes");
+  const [keyPoints, setKeyPoints] = useState("");
   
-  // Initialize notes from localStorage
+  // Initialize from localStorage
   useEffect(() => {
     const savedNotes = getNotes();
-    if (savedNotes) {
-      // Load team notes if they exist
-      if (savedNotes.teamNotes) {
-        setTeamNotes({
-          og: savedNotes.teamNotes.og || '',
-          oo: savedNotes.teamNotes.oo || '',
-          cg: savedNotes.teamNotes.cg || '',
-          co: savedNotes.teamNotes.co || ''
-        });
-      }
+    if (savedNotes?.listening?.keyPoints) {
+      setKeyPoints(savedNotes.listening.keyPoints);
     }
-  }, [role, motion]);
-
-  const handleTeamNoteChange = (team: 'og' | 'oo' | 'cg' | 'co', value: string) => {
-    const updatedTeamNotes = {
-      ...teamNotes,
-      [team]: value
-    };
-    setTeamNotes(updatedTeamNotes);
-    saveToLocalStorage('teamNotes', updatedTeamNotes);
+  }, []);
+  
+  const handleKeyPointsChange = (value: string) => {
+    setKeyPoints(value);
     
-    toast({
-      title: "Notes saved",
-      description: `Your notes for ${team.toUpperCase()} have been saved.`
-    });
-  };
-
-  const saveToLocalStorage = (key: string, data: any) => {
+    // Save to localStorage
     const savedNotes = getNotes() || {
       motion,
       role,
@@ -66,10 +47,22 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
       lastUpdated: Date.now()
     };
     
-    savedNotes[key] = data;
+    savedNotes.listening = {
+      ...savedNotes.listening,
+      keyPoints: value
+    };
+    
     saveNotes(savedNotes);
   };
-
+  
+  const handleComplete = () => {
+    onComplete();
+    toast({
+      title: "Moving to Speech Stage",
+      description: "Get ready to deliver your speech!"
+    });
+  };
+  
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
@@ -78,17 +71,74 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
         <p className="mt-3">{roleData.listening.description}</p>
       </div>
       
-      <div className="mb-6">
-        <TeamNotesGrid 
-          notes={teamNotes} 
-          onChange={handleTeamNoteChange} 
-        />
-      </div>
-      
-      <div className="text-right mt-6">
-        <Button onClick={onComplete} size="lg">
-          Continue to Speech Stage
-        </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column */}
+        <div className="lg:col-span-1 space-y-6">
+          <Timer 
+            initialTime={debateTime}
+            timerLabel="Speech Time"
+            onComplete={() => toast({
+              title: "Time's up!",
+              description: "The current speech has ended."
+            })}
+          />
+          
+          <InstructionPanel 
+            title="Instructions" 
+            items={roleData.listening.instructions} 
+          />
+          
+          <InstructionPanel 
+            title="Key Points to Note" 
+            items={roleData.listening.keyPointsToNote} 
+          />
+          
+          <InstructionPanel 
+            title="Tips" 
+            items={roleData.listening.tips} 
+          />
+        </div>
+        
+        {/* Right Column */}
+        <div className="lg:col-span-2">
+          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-3 mb-4">
+              <TabsTrigger value="notes">Key Points</TabsTrigger>
+              <TabsTrigger value="teams">Team Notes</TabsTrigger>
+              <TabsTrigger value="interactive">Interactive</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="notes" className="mt-0">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Key Points</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={keyPoints}
+                    onChange={(e) => handleKeyPointsChange(e.target.value)}
+                    placeholder="Note key points from the speeches..."
+                    className="min-h-[300px]"
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="teams" className="mt-0">
+              <TeamNotesGrid role={role} />
+            </TabsContent>
+            
+            <TabsContent value="interactive" className="mt-0">
+              <InteractiveListeningPrompts role={role} motion={motion} />
+            </TabsContent>
+          </Tabs>
+          
+          <div className="mt-6 text-right">
+            <Button onClick={handleComplete} size="lg">
+              Continue to Speech Stage
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

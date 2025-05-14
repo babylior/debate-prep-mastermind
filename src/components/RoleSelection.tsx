@@ -34,15 +34,6 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onComplete }) => {
   };
   
   const handleStartPrep = () => {
-    if (!motion.trim()) {
-      toast({
-        title: "Motion required",
-        description: "Please enter a motion before starting prep.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
     if (!selectedRole) {
       toast({
         title: "Role required",
@@ -52,9 +43,12 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onComplete }) => {
       return;
     }
     
-    saveMotion(motion);
+    // Allow empty motion
+    const finalMotion = motion.trim() || "No motion specified";
+    
+    saveMotion(finalMotion);
     saveRole(selectedRole);
-    onComplete(selectedRole, motion);
+    onComplete(selectedRole, finalMotion);
     
     toast({
       title: "Prep started",
@@ -98,12 +92,12 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onComplete }) => {
       <Card className="border-t-4 border-t-primary">
         <CardHeader>
           <CardTitle className="text-2xl">BP Debate Assistant</CardTitle>
-          <CardDescription>Enter the motion to begin your prep</CardDescription>
+          <CardDescription>Select your role and optionally enter a motion</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <label htmlFor="motion" className="block text-lg font-medium mb-2">
-              Debate Motion
+              Debate Motion (Optional)
             </label>
             <Input
               id="motion"
@@ -170,7 +164,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onComplete }) => {
       <div className="flex justify-center mt-8">
         <Button 
           size="lg" 
-          disabled={!motion.trim() || !selectedRole}
+          disabled={!selectedRole}
           onClick={handleStartPrep}
           className="px-8 py-6 text-lg"
         >
