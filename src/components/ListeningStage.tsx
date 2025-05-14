@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,65 +36,63 @@ const ListeningStage: React.FC<ListeningStageProps> = ({ role, motion, onComplet
   };
   
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+    <div className="max-w-full mx-auto p-2">
+      <div className="bg-white rounded-lg shadow-sm border p-3 mb-3">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">{roleData.listening.title}</h1>
+            <h1 className="text-xl font-bold">{roleData.listening.title}</h1>
             <p className="text-gray-600 mt-1">{motion}</p>
-            <p className="mt-3">{roleData.listening.description}</p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => setShowInstructions(!showInstructions)}
-          >
-            {showInstructions ? "Hide" : "Show"} Instructions
-          </Button>
+          <div className="flex gap-3 items-center">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowInstructions(!showInstructions)}
+            >
+              {showInstructions ? "Hide" : "Show"} Instructions
+            </Button>
+            <Timer 
+              initialTime={debateTime}
+              timerLabel="Speech Time"
+              onComplete={() => toast({
+                title: "Time's up!",
+                description: "The current speech has ended."
+              })}
+            />
+          </div>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column */}
-        <div className="lg:col-span-1 space-y-6">
-          <Timer 
-            initialTime={debateTime}
-            timerLabel="Speech Time"
-            onComplete={() => toast({
-              title: "Time's up!",
-              description: "The current speech has ended."
-            })}
-          />
-          
-          {showInstructions && (
-            <>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+        {/* Left Column - Minimized instructions */}
+        {showInstructions && (
+          <div className="lg:col-span-2 space-y-3">
+            <InstructionPanel 
+              title="Instructions" 
+              items={roleData.listening.instructions} 
+            />
+            
+            {roleData.listening.keyPointsToNote && (
               <InstructionPanel 
-                title="Instructions" 
-                items={roleData.listening.instructions} 
+                title="Key Points to Note" 
+                items={roleData.listening.keyPointsToNote} 
               />
-              
-              {roleData.listening.keyPointsToNote && (
-                <InstructionPanel 
-                  title="Key Points to Note" 
-                  items={roleData.listening.keyPointsToNote} 
-                />
-              )}
-              
-              <InstructionPanel 
-                title="Tips" 
-                items={roleData.listening.tips} 
-              />
-            </>
-          )}
-        </div>
+            )}
+            
+            <InstructionPanel 
+              title="Tips" 
+              items={roleData.listening.tips} 
+            />
+          </div>
+        )}
         
         {/* Right Column - Now showing only TeamNotesGrid */}
-        <div className="lg:col-span-2">
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Team Notes</h2>
+        <div className={`${showInstructions ? 'lg:col-span-10' : 'lg:col-span-12'} flex flex-col`}>
+          <div className="flex-grow">
             <TeamNotesGrid role={role} />
-          </Card>
+          </div>
           
-          <div className="mt-6 text-right">
+          <div className="mt-4 text-right">
             <Button onClick={handleComplete} size="lg">
               Continue to Speech Stage
             </Button>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { getNotes, saveNotes } from "@/utils/localStorage";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
 interface TeamNotesGridProps {
   role: string;
@@ -37,8 +38,8 @@ const createEmptyTeamNotes = (): TeamNotes => ({
   coRebuttal: '',
   ogComparison: '',
   ooComparison: '',
-  cgComparison: '',
   coComparison: '',
+  cgComparison: '',
 });
 
 const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ role, onChange }) => {
@@ -80,51 +81,64 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ role, onChange }) => {
     }
   };
 
+  // Get team names and colors
+  const teams = [
+    { id: 'og', name: 'Opening Government', color: 'green' },
+    { id: 'oo', name: 'Opening Opposition', color: 'blue' },
+    { id: 'cg', name: 'Closing Government', color: 'yellow' },
+    { id: 'co', name: 'Closing Opposition', color: 'red' }
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {['og', 'oo', 'cg', 'co'].map((team) => (
-        <Card key={team} className={`border-l-4 border-${team === 'og' ? 'green' : team === 'oo' ? 'blue' : team === 'cg' ? 'yellow' : 'red'}-500 hover:shadow-md transition-all duration-200`}>
-          <CardHeader className={`bg-${team === 'og' ? 'green' : team === 'oo' ? 'blue' : team === 'cg' ? 'yellow' : 'red'}-50 bg-opacity-50 pb-2`}>
-            <CardTitle className="text-lg flex items-center">
-              <span className={`w-6 h-6 rounded-full bg-${team === 'og' ? 'green' : team === 'oo' ? 'blue' : team === 'cg' ? 'yellow' : 'red'}-500 flex items-center justify-center text-white text-xs font-bold mr-2`}>
-                {team.toUpperCase()}
-              </span>
-              {team === 'og' ? 'Opening Government' : 
-               team === 'oo' ? 'Opening Opposition' :
-               team === 'cg' ? 'Closing Government' : 'Closing Opposition'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-3 space-y-4">
-            <div>
-              <Label>Arguments & Points</Label>
-              <Textarea
-                value={notes[team as keyof TeamNotes] || ''}
-                onChange={(e) => handleChange(team as keyof TeamNotes, e.target.value)}
-                className="min-h-[100px] resize-vertical"
-                placeholder={`Note key arguments from ${team.toUpperCase()}...`}
-              />
-            </div>
-            <div>
-              <Label>Your Rebuttal</Label>
-              <Textarea
-                value={notes[`${team}Rebuttal` as keyof TeamNotes] || ''}
-                onChange={(e) => handleChange(`${team}Rebuttal` as keyof TeamNotes, e.target.value)}
-                className="min-h-[100px] resize-vertical"
-                placeholder="How would you respond to this speaker's case?"
-              />
-            </div>
-            <div>
-              <Label>Case Comparison</Label>
-              <Textarea
-                value={notes[`${team}Comparison` as keyof TeamNotes] || ''}
-                onChange={(e) => handleChange(`${team}Comparison` as keyof TeamNotes, e.target.value)}
-                className="min-h-[100px] resize-vertical"
-                placeholder="How does your case compare to theirs?"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="w-full h-full">
+      <Table className="border rounded-lg shadow-sm">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-1/5">Team</TableHead>
+            <TableHead className="w-5/15">Arguments & Points</TableHead>
+            <TableHead className="w-5/15">Your Rebuttal</TableHead>
+            <TableHead className="w-4/15">Case Comparison</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {teams.map((team) => (
+            <TableRow key={team.id} className="hover:bg-muted/30">
+              <TableCell className={`bg-debate-${team.id} bg-opacity-10 font-medium`}>
+                <div className="flex items-center space-x-2">
+                  <span className={`w-6 h-6 rounded-full bg-debate-${team.id} flex items-center justify-center text-white text-xs font-bold`}>
+                    {team.id.toUpperCase()}
+                  </span>
+                  <span>{team.name}</span>
+                </div>
+              </TableCell>
+              <TableCell className="p-0">
+                <Textarea
+                  value={notes[team.id as keyof TeamNotes] || ''}
+                  onChange={(e) => handleChange(team.id as keyof TeamNotes, e.target.value)}
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 min-h-[180px] resize-none"
+                  placeholder={`Note key arguments from ${team.name}...`}
+                />
+              </TableCell>
+              <TableCell className="p-0">
+                <Textarea
+                  value={notes[`${team.id}Rebuttal` as keyof TeamNotes] || ''}
+                  onChange={(e) => handleChange(`${team.id}Rebuttal` as keyof TeamNotes, e.target.value)}
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 min-h-[180px] resize-none"
+                  placeholder="How would you respond to these arguments?"
+                />
+              </TableCell>
+              <TableCell className="p-0">
+                <Textarea
+                  value={notes[`${team.id}Comparison` as keyof TeamNotes] || ''}
+                  onChange={(e) => handleChange(`${team.id}Comparison` as keyof TeamNotes, e.target.value)}
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 min-h-[180px] resize-none"
+                  placeholder="How does your case compare?"
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
