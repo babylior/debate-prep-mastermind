@@ -1,24 +1,13 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { getNotes, saveNotes } from "@/utils/localStorage";
 
 interface TeamNotesGridProps {
-  notes: {
-    og: string;
-    oo: string;
-    cg: string;
-    co: string;
-    ogRebuttal?: string;
-    ooRebuttal?: string;
-    cgRebuttal?: string;
-    coRebuttal?: string;
-    ogComparison?: string;
-    ooComparison?: string;
-    cgComparison?: string;
-    coComparison?: string;
-  };
-  onChange: (team: keyof TeamNotes, value: string) => void;
+  role: string; // Add this property
+  onChange?: (team: keyof TeamNotes, value: string) => void;
 }
 
 interface TeamNotes {
@@ -36,7 +25,37 @@ interface TeamNotes {
     coComparison?: string;
 }
 
-const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
+const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ role, onChange }) => {
+  const [notes, setNotes] = useState<TeamNotes>({
+    og: '',
+    oo: '',
+    cg: '',
+    co: '',
+  });
+
+  useEffect(() => {
+    // Load notes from localStorage
+    const savedNotes = getNotes();
+    if (savedNotes?.teamNotes) {
+      setNotes(savedNotes.teamNotes);
+    }
+  }, []);
+
+  const handleChange = (team: keyof TeamNotes, value: string) => {
+    const updatedNotes = { ...notes, [team]: value };
+    setNotes(updatedNotes);
+    
+    // Save to localStorage
+    const savedNotes = getNotes() || {};
+    savedNotes.teamNotes = updatedNotes;
+    saveNotes(savedNotes);
+    
+    // Call parent onChange if provided
+    if (onChange) {
+      onChange(team, value);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {['og', 'oo', 'cg', 'co'].map((team) => (
@@ -55,8 +74,8 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
             <div>
               <Label>Arguments & Points</Label>
               <Textarea
-                value={notes[team]}
-                onChange={(e) => onChange(team as keyof typeof notes, e.target.value)}
+                value={notes[team as keyof TeamNotes] || ''}
+                onChange={(e) => handleChange(team as keyof TeamNotes, e.target.value)}
                 className="min-h-[100px] resize-vertical"
                 placeholder={`Note key arguments from ${team.toUpperCase()}...`}
               />
@@ -64,8 +83,8 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
             <div>
               <Label>Your Rebuttal</Label>
               <Textarea
-                value={notes[`${team}Rebuttal`] || ''}
-                onChange={(e) => onChange(`${team}Rebuttal` as keyof typeof notes, e.target.value)}
+                value={notes[`${team}Rebuttal` as keyof TeamNotes] || ''}
+                onChange={(e) => handleChange(`${team}Rebuttal` as keyof TeamNotes, e.target.value)}
                 className="min-h-[100px] resize-vertical"
                 placeholder="How would you respond to this speaker's case?"
               />
@@ -73,8 +92,8 @@ const TeamNotesGrid: React.FC<TeamNotesGridProps> = ({ notes, onChange }) => {
             <div>
               <Label>Case Comparison</Label>
               <Textarea
-                value={notes[`${team}Comparison`] || ''}
-                onChange={(e) => onChange(`${team}Comparison` as keyof typeof notes, e.target.value)}
+                value={notes[`${team}Comparison` as keyof TeamNotes] || ''}
+                onChange={(e) => handleChange(`${team}Comparison` as keyof TeamNotes, e.target.value)}
                 className="min-h-[100px] resize-vertical"
                 placeholder="How does your case compare to theirs?"
               />

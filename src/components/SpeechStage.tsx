@@ -162,14 +162,18 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             title="Instructions" 
             items={roleData.speech.instructions} 
           />
-          <InstructionPanel 
-            title="Structure Tips" 
-            items={roleData.speech.structure} 
-          />
-          <InstructionPanel 
-            title="Delivery Tips" 
-            items={roleData.speech.delivery} 
-          />
+          {roleData.speech.structure && (
+            <InstructionPanel 
+              title="Structure Tips" 
+              items={roleData.speech.structure} 
+            />
+          )}
+          {roleData.speech.delivery && (
+            <InstructionPanel 
+              title="Delivery Tips" 
+              items={roleData.speech.delivery} 
+            />
+          )}
         </div>
       )}
 
