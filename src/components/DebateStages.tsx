@@ -7,7 +7,6 @@ import SpeechStage from './SpeechStage';
 import { debateRoles, DebateRole } from '@/utils/debateData';
 import { getNotes, getMotion } from '@/utils/localStorage';
 import NavigationBar from './NavigationBar';
-import EditableMotion from './EditableMotion';
 
 interface DebateStagesProps {
   selectedRole: string;
@@ -15,9 +14,8 @@ interface DebateStagesProps {
   onReset: () => void;
 }
 
-const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initialMotion, onReset }) => {
+const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion, onReset }) => {
   const [activeStage, setActiveStage] = useState<string>('prep');
-  const [motion, setMotion] = useState(initialMotion);
   const role = selectedRole as DebateRole;
   
   const currentRole = debateRoles.find(r => r.id === role);
@@ -50,10 +48,6 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initi
     setActiveStage('speech');
   };
 
-  const handleMotionChange = (newMotion: string) => {
-    setMotion(newMotion);
-  };
-
   return (
     <div className="w-full">
       {/* Team and motion info at the top */}
@@ -63,7 +57,7 @@ const DebateStages: React.FC<DebateStagesProps> = ({ selectedRole, motion: initi
         </div>
         <div>
           <h1 className="text-2xl font-bold">{currentRole?.fullName}</h1>
-          <EditableMotion motion={motion} onMotionChange={handleMotionChange} />
+          <p className="text-gray-600">{motion}</p>
         </div>
       </div>
       

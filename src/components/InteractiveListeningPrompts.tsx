@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { roleContent, DebateRole } from "@/utils/debateData";
-import { getNotes, saveNotes } from "@/utils/localStorage";
+import { Label } from "@/components/ui/label";
 
 interface InteractivePrompt {
   id: string;
@@ -12,71 +11,14 @@ interface InteractivePrompt {
 }
 
 interface InteractiveListeningPromptsProps {
-  role: string;
-  motion: string;
+  prompts: InteractivePrompt[];
+  onChange: (id: string, answer: string) => void;
 }
 
 const InteractiveListeningPrompts: React.FC<InteractiveListeningPromptsProps> = ({
-  role,
-  motion,
+  prompts,
+  onChange,
 }) => {
-  const [prompts, setPrompts] = useState<InteractivePrompt[]>([]);
-
-  useEffect(() => {
-    // Generate prompts from roleContent questions
-    const roleData = roleContent[role as DebateRole];
-    const questions = roleData?.listening?.questions || [];
-    
-    const newPrompts = questions.map((question, index) => ({
-      id: `prompt-${index}`,
-      question,
-      answer: '',
-    }));
-    
-    // Load any saved answers from localStorage
-    const savedNotes = getNotes();
-    if (savedNotes && savedNotes.interactivePrompts) {
-      const savedPrompts = savedNotes.interactivePrompts;
-      
-      // If savedPrompts is an object with keys matching our prompt IDs
-      if (typeof savedPrompts === 'object' && savedPrompts !== null) {
-        newPrompts.forEach(prompt => {
-          if (savedPrompts[prompt.id]) {
-            prompt.answer = savedPrompts[prompt.id];
-          }
-        });
-      }
-    }
-    
-    setPrompts(newPrompts);
-  }, [role]);
-
-  const handleChange = (id: string, answer: string) => {
-    // Update state
-    const updatedPrompts = prompts.map(prompt => 
-      prompt.id === id ? { ...prompt, answer } : prompt
-    );
-    setPrompts(updatedPrompts);
-    
-    // Save to localStorage
-    const savedNotes = getNotes() || {
-      motion,
-      role,
-      prep: {},
-      listening: {},
-      speech: {},
-      lastUpdated: Date.now(),
-      interactivePrompts: {}
-    };
-    
-    if (!savedNotes.interactivePrompts) {
-      savedNotes.interactivePrompts = {};
-    }
-    
-    savedNotes.interactivePrompts[id] = answer;
-    saveNotes(savedNotes);
-  };
-
   return (
     <div className="space-y-4">
       {prompts.map((prompt) => (
@@ -87,7 +29,7 @@ const InteractiveListeningPrompts: React.FC<InteractiveListeningPromptsProps> = 
           <CardContent>
             <Textarea
               value={prompt.answer}
-              onChange={(e) => handleChange(prompt.id, e.target.value)}
+              onChange={(e) => onChange(prompt.id, e.target.value)}
               placeholder="Write your answer here..."
               className="min-h-[100px]"
             />

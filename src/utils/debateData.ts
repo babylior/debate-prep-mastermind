@@ -23,9 +23,6 @@ export interface StageContent {
   instructions: string[];
   questions: string[];
   tips: string[];
-  keyPointsToNote?: string[]; // Add this property
-  structure?: string[]; // Add this property
-  delivery?: string[]; // Add this property
   templateSections?: {
     name: string;
     duration: string;

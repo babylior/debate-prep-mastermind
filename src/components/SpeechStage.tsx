@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
@@ -9,7 +9,6 @@ import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
 import SpeechStructurePanel from "./SpeechStructurePanel";
 import ContentPanel from "./ContentPanel";
-import InstructionPanel from './InstructionPanel';
 
 interface SpeechStageProps {
   role: string;
@@ -50,8 +49,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
     rebuttals: [],
     framing: []
   });
-  
-  const [showInstructions, setShowInstructions] = useState(false);
 
   useEffect(() => {
     const savedNotes = getNotes();
@@ -142,12 +139,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
             <p className="text-gray-600 mt-1">{motion}</p>
           </div>
           <div className="flex space-x-3">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowInstructions(!showInstructions)}
-            >
-              {showInstructions ? "Hide" : "Show"} Instructions
-            </Button>
             <ExportButton />
             <Button variant="outline" onClick={onReset}>
               Start Over
@@ -155,27 +146,6 @@ const SpeechStage: React.FC<SpeechStageProps> = ({ role, motion, onReset }) => {
           </div>
         </div>
       </div>
-      
-      {showInstructions && (
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <InstructionPanel 
-            title="Instructions" 
-            items={roleData.speech.instructions} 
-          />
-          {roleData.speech.structure && (
-            <InstructionPanel 
-              title="Structure Tips" 
-              items={roleData.speech.structure} 
-            />
-          )}
-          {roleData.speech.delivery && (
-            <InstructionPanel 
-              title="Delivery Tips" 
-              items={roleData.speech.delivery} 
-            />
-          )}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">

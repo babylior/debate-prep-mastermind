@@ -9,7 +9,6 @@ import { getNotes, saveNotes } from "@/utils/localStorage";
 import { roleContent, DebateRole } from "@/utils/debateData";
 import DraggableArgumentCard from './DraggableArgumentCard';
 import { Plus } from 'lucide-react';
-import InstructionPanel from './InstructionPanel';
 
 interface PrepStageProps {
   role: string;
@@ -243,20 +242,44 @@ const PrepStage: React.FC<PrepStageProps> = ({ role, motion, onComplete }) => {
             autoStart={autoStartTimer}
           />
           
-          <InstructionPanel 
-            title="Instructions" 
-            items={roleData.prep.instructions}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Instructions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <ul className="list-disc pl-5 space-y-1">
+                {roleData.prep.instructions.map((instruction, idx) => (
+                  <li key={idx}>{instruction}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
           
-          <InstructionPanel 
-            title="Key Questions" 
-            items={roleData.prep.questions}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Key Questions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="list-disc pl-5 space-y-2">
+                {roleData.prep.questions.map((question, idx) => (
+                  <li key={idx}>{question}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
           
-          <InstructionPanel 
-            title="Tips" 
-            items={roleData.prep.tips}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Tips</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="list-disc pl-5 space-y-1">
+                {roleData.prep.tips.map((tip, idx) => (
+                  <li key={idx}>{tip}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
         </div>
         
         {/* Right Column - Notes */}
